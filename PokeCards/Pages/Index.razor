@@ -1,0 +1,28 @@
+@page "/"
+@using PokeCards.Services
+@using PokeCards.Data
+@inject PokeApiService PokeApiService 
+
+<PageTitle>PokeCards</PageTitle>
+
+<h1>Pokemon Types</h1>
+
+<div>
+    <ul>
+        @foreach (var pokemonType in _pokemonTypes)
+        {
+            <li>@pokemonType.Id   -   @pokemonType.Name <img src="https://cdn.traction.one/pokedex/pokemon/@(pokemonType.Id).png" class="img img-pokemon"></li>  
+        }
+    </ul>
+</div>
+
+
+@code
+{
+    private List<PokemonType> _pokemonTypes = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pokemonTypes = await PokeApiService.GetPokemonTypesAsync();
+    }
+}
