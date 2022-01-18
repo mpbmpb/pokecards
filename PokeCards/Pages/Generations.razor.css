@@ -1,0 +1,163 @@
+
+.pokemon-container {
+    width: 100%;
+}
+.pokemon-list {
+    padding: 2rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 2rem;
+}
+
+@media (max-width: 399px) {
+    .pokemon-list {
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 1rem;
+    }
+    .species-card > h5 {
+        font-size: 5vw;
+    }
+}
+
+.switch {
+    position: relative;
+    width: 20rem;
+    height: 3rem;
+    padding: 0 1rem;
+    z-index: 0;
+}
+
+.switch:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 3rem;
+    background: linear-gradient(180deg, rgba(111,23,245,1) 0%, rgba(59,4,125,1) 100%);
+    border-radius: 1000vw;
+}
+.switch-label {
+    display: inline-block;
+    width: 2rem;
+    padding: .75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: color 200ms ease-out;
+    font-size: 1rem;
+}
+.switch-label:hover {
+    color: white;
+}
+.switch-indicator {
+    position: absolute;
+    display: inline-block;
+    width: 4rem;
+    height: 4rem;
+    top: -0.5rem;
+    left: -1.05rem;
+    background: radial-gradient(circle at 50% 55%, rgba(55, 186, 255, 0.9), rgba(55, 186, 255, 0.9) 40%, rgba(36, 181, 255, 0.8) 60%, rgba(43, 130, 255, 0.4));
+    opacity: .6;
+    border-radius: 50%;
+    transition: transform 800ms cubic-bezier(0.02, 0.94, 0.09, 0.97), background 300ms cubic-bezier(0.17, 0.67, 0.14, 1.03);
+    transform: translate3d(1rem, 0, 0);
+}
+.ball {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    position: relative;
+    background: radial-gradient(circle at 50% 55%, rgba(240, 245, 255, 0.9), rgba(240, 245, 255, 0.9) 40%, rgba(225, 238, 255, 0.8) 60%, rgba(43, 130, 255, 0.4));
+}
+.switch-indicator:before {
+    content: '';
+    position: absolute;
+    top: 1%;
+    left: 5%;
+    border-radius: 100%;
+    z-index: 2;
+    height: 80%;
+    width: 40%;
+    background: radial-gradient(circle at 130% 130%, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0.8) 58%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0) 100%);
+    transform: translateX(131%) translateY(58%) rotateZ(168deg) rotateX(10deg);
+}
+.switch-indicator:after {
+    content: '';
+    position: absolute;
+    display: block;
+    top: 5%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    border-radius: 100%;
+    filter: blur(1px);
+    z-index: 2;
+    transform: rotateZ(-30deg);
+    background: radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 74%, white 80%, white 84%, rgba(255, 255, 255, 0) 100%);
+    box-shadow: -0.5px -3px 3px 3px #FFF3 ,2px 13px 5px 5px #0002;
+}
+
+.switch-label {
+    transition: transform 50ms linear;
+}
+.switch input#s1:checked ~ .switch-label[for="s1"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s2:checked ~ .switch-label[for="s2"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s3:checked ~ .switch-label[for="s3"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s4:checked ~ .switch-label[for="s4"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s5:checked ~ .switch-label[for="s5"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s6:checked ~ .switch-label[for="s6"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s7:checked ~ .switch-label[for="s7"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s8:checked ~ .switch-label[for="s8"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+
+.switch input#s1:checked ~ .switch-indicator {
+    transform: translate3d(1rem, 0, 0);
+}
+.switch input#s2:checked ~ .switch-indicator {
+    transform: translate3d(3.3rem, 0, 0);
+}
+.switch input#s3:checked ~ .switch-indicator {
+    transform: translate3d(5.6rem, 0, 0);
+}
+.switch input#s4:checked ~ .switch-indicator {
+    transform: translate3d(7.9rem, 0, 0);
+}
+.switch input#s5:checked ~ .switch-indicator {
+    transform: translate3d(10.2rem, 0, 0);
+}
+.switch input#s6:checked ~ .switch-indicator {
+    transform: translate3d(12.5rem, 0, 0);
+}
+.switch input#s7:checked ~ .switch-indicator {
+    transform: translate3d(14.8rem, 0, 0);
+}
+.switch input#s8:checked ~ .switch-indicator {
+    transform: translate3d(17.1rem, 0, 0);
+}
+.switch input[type=radio]:not(:checked), .switch input[type=radio]:checked {
+    display: none;
+}
