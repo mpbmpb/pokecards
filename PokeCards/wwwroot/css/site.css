@@ -1,5 +1,8 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+:root {
+    --hue-var: 0;
+}
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -82,43 +85,12 @@ a, .btn-link {
 .card-wrapper {
     position: relative;
     z-index: 0;
-}
-
-/*.card-wrapper::before,*/
-/*.card-wrapper::after {*/
-/*    position: absolute;*/
-/*    content: '';*/
-/*    top: -2px;*/
-/*    left: -2px;*/
-/*    right: -2px;*/
-/*    bottom: -2px;*/
-/*    border-radius: .5rem;*/
-/*    background: linear-gradient(45deg, #fb0094, #0000FF, #00FF00, #FFFF00, #fb0094, #0000FF, #00FF00, #FFFF00);*/
-/*    background-size: 400%;*/
-/*    z-index: -1;*/
-/*    animation: rainbow-wave 15s linear infinite;*/
-/*}*/
-
-/*.card-wrapper::after {*/
-/*    filter: blur(10px);*/
-/*}*/
-
-@keyframes rainbow-wave {
-    0% {
-        background-position: 0 0;
-    }
-    50% {
-        background-position: 100% 0;
-    }
-    100% {
-        background-position: 0 0;
-    }
-    
+    cursor: pointer;
 }
 
 .species-card {
     position: relative;
-    
+    display: inline-block;
     outline: 1px solid rgba(46,3,98,0.5);
     padding: 1rem .5rem 1rem .5rem;
     border-radius: .5rem;
@@ -145,6 +117,41 @@ a, .btn-link {
     background-size: cover;
     opacity: .25;
 }
+.species-card:hover::after {
+    opacity: 0;
+}
+
+.card-wrapper:hover::before,
+.card-wrapper:hover::after {
+    position: absolute;
+    content: '';
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: .5rem;
+    background: linear-gradient(45deg, #fb0094, #0000FF, #00FF00, #FFFF00, #fb0094, #0000FF, #00FF00, #FFFF00);
+    background-size: 400%;
+    z-index: -1;
+    animation: rainbow-wave 10s linear infinite;
+}
+
+.card-wrapper:hover::after {
+    filter: blur(15px);
+}
+
+@keyframes rainbow-wave {
+    0% {
+        background-position: 0 0;
+    }
+    50% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+
+}
 
 
 .img-pokemon {
@@ -160,6 +167,10 @@ a, .btn-link {
 .species-card > h5 {
     font-size: 1.5rem;
     margin: 0 0 1rem 0;
+}
+
+.species-card:hover {
+    color: hsl(80, 100%, 50%);
 }
 
 @media (max-width: 399px) {
@@ -188,9 +199,8 @@ a, .btn-link {
     z-index: -1;
     width: 100%;
     height: 3rem;
-    background: #000;
-    border-radius: 30px;
-    border: 1px solid black;
+    background: linear-gradient(180deg, rgba(111,23,245,1) 0%, rgba(59,4,125,1) 100%);
+    border-radius: 1000vw;
 }
 .switch-label {
     display: inline-block;
@@ -205,47 +215,112 @@ a, .btn-link {
     color: white;
 }
 .switch-indicator {
+    position: absolute;
+    display: inline-block;
     width: 4rem;
     height: 4rem;
-    position: absolute;
     top: -0.5rem;
     left: -1.05rem;
-    background: transparent;
-    opacity: .4;
+    background: radial-gradient(circle at 50% 55%, rgba(55, 186, 255, 0.9), rgba(55, 186, 255, 0.9) 40%, rgba(36, 181, 255, 0.8) 60%, rgba(43, 130, 255, 0.4));
+    opacity: .6;
     border-radius: 50%;
-    transition: transform 600ms cubic-bezier(0.02, 0.94, 0.09, 0.97), background 300ms cubic-bezier(0.17, 0.67, 0.14, 1.03);
+    transition: transform 800ms cubic-bezier(0.02, 0.94, 0.09, 0.97), background 300ms cubic-bezier(0.17, 0.67, 0.14, 1.03);
     transform: translate3d(1rem, 0, 0);
 }
+.ball {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    position: relative;
+    background: radial-gradient(circle at 50% 55%, rgba(240, 245, 255, 0.9), rgba(240, 245, 255, 0.9) 40%, rgba(225, 238, 255, 0.8) 60%, rgba(43, 130, 255, 0.4));
+}
+.switch-indicator:before {
+    content: '';
+    position: absolute;
+    top: 1%;
+    left: 5%;
+    border-radius: 100%;
+    z-index: 2;
+    height: 80%;
+    width: 40%;
+    background: radial-gradient(circle at 130% 130%, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0.8) 58%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0) 100%);
+    transform: translateX(131%) translateY(58%) rotateZ(168deg) rotateX(10deg);
+}
+.switch-indicator:after {
+    content: '';
+    position: absolute;
+    display: block;
+    top: 5%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    border-radius: 100%;
+    filter: blur(1px);
+    z-index: 2;
+    transform: rotateZ(-30deg);
+    background: radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 74%, white 80%, white 84%, rgba(255, 255, 255, 0) 100%);
+    box-shadow: -0.5px -3px 3px 3px #FFF3 ,2px 13px 5px 5px #0002;
+}
+
+.switch-label {
+    transition: transform 50ms linear;
+}
+.switch input#s1:checked ~ .switch-label[for="s1"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s2:checked ~ .switch-label[for="s2"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s3:checked ~ .switch-label[for="s3"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s4:checked ~ .switch-label[for="s4"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s5:checked ~ .switch-label[for="s5"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s6:checked ~ .switch-label[for="s6"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s7:checked ~ .switch-label[for="s7"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+.switch input#s8:checked ~ .switch-label[for="s8"] {
+    transform: scale(2);
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
+
 .switch input#s1:checked ~ .switch-indicator {
-    background: PaleGreen;
     transform: translate3d(1rem, 0, 0);
 }
 .switch input#s2:checked ~ .switch-indicator {
-    background: MediumTurquoise;
     transform: translate3d(3.3rem, 0, 0);
 }
 .switch input#s3:checked ~ .switch-indicator {
-    background: cyan;
     transform: translate3d(5.6rem, 0, 0);
 }
 .switch input#s4:checked ~ .switch-indicator {
-    background: cyan;
     transform: translate3d(7.9rem, 0, 0);
 }
 .switch input#s5:checked ~ .switch-indicator {
-    background: cyan;
     transform: translate3d(10.2rem, 0, 0);
 }
 .switch input#s6:checked ~ .switch-indicator {
-    background: cyan;
     transform: translate3d(12.5rem, 0, 0);
 }
 .switch input#s7:checked ~ .switch-indicator {
-    background: cyan;
     transform: translate3d(14.8rem, 0, 0);
 }
 .switch input#s8:checked ~ .switch-indicator {
-    background: cyan;
     transform: translate3d(17.1rem, 0, 0);
 }
 .switch input[type=radio]:not(:checked), .switch input[type=radio]:checked {

@@ -2,30 +2,19 @@
 @using PokeCards.Services
 @using PokeCards.Data
 @inject PokeApiService PokeApiService 
+@inject NavigationManager NavigationManager
 
 <PageTitle>Generations</PageTitle>
 
 <h1>Generations</h1>
 
 <div class="switch">
-  <input name="switch" id="s1" type="radio" checked/>
-  <label for="s1" class="switch-label">1</label>
-  <input name="switch" id="s2" type="radio" />
-  <label for="s2" class="switch-label">2</label>
-  <input name="switch" id="s3" type="radio" />
-  <label for="s3" class="switch-label" >3</label>
-  <input name="switch" id="s4" type="radio" />
-  <label for="s4" class="switch-label">4</label>
-  <input name="switch" id="s5" type="radio" />
-  <label for="s5" class="switch-label">5</label>
-  <input name="switch" id="s6" type="radio" />
-  <label for="s6" class="switch-label" >6</label>
-  <input name="switch" id="s7" type="radio" />
-  <label for="s7" class="switch-label">7</label>
-  <input name="switch" id="s8" type="radio" />
-  <label for="s8" class="switch-label">8</label>
-  
-  <div class="switch-indicator" ></div>
+    @for (var gen = 1; gen < 9; gen++)
+    {
+        <input type="radio" name="switch" id="@("s" + gen)" value="@gen" @onchange="RadioSelect"/>
+        <label for="@("s" + gen)" class="switch-label">@gen</label>
+    }
+    <div class="switch-indicator"><span class="switch-shadow"></span></div>
 </div>
 
 <div class="pokemon-container"> 
@@ -33,11 +22,11 @@
         @foreach (var pokemon in _pokemons)
         {
             <div class="card-wrapper">
-                <div class="species-card">
+                <a class="species-card" href="species/@pokemon.Id">
                     <img src="Images/Species/@(pokemon.Id).png" alt="@pokemon.Name" class="img img-pokemon"/>
                     <p class="pokemon-id">#@pokemon.Id</p>
                     <h5 class="pokemon-name">@pokemon.Name</h5>
-                </div>
+                </a>
             </div>
         }
     </div>
@@ -46,14 +35,31 @@
 
 @code
 {
+    private int _selectedGeneration = 1;
+    private string _link = "";
     private List<Pokemon> _pokemonList = new ();
     private IEnumerable<Pokemon> _pokemons = ArraySegment<Pokemon>.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         _pokemonList = await PokeApiService.GetAllPokemonAsync();
-        var generation = PokeApiService.GenerationRange(1);
+        var generation = PokeApiService.GenerationRange(_selectedGeneration);
         _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
     }
 
+    private void RadioSelect(ChangeEventArgs args)
+    {
+        int.TryParse(args.Value.ToString(), out _selectedGeneration);
+        if (_selectedGeneration is > 0 and < 9)
+        {
+            var generation = PokeApiService.GenerationRange(_selectedGeneration);
+            _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
+        }
+    }
+
+
+    private void SetHref(string id)
+    {
+        NavigationManager.NavigateTo($"/species/{id}");
+    }
 }
