@@ -1,9 +1,27 @@
-@page "/Species"
+@page "/species"
+@page "/species/{Id}"
+@using PokeCards.Data
+@using System.Reflection.Metadata
+@using PokeCards.Services
+@inject PokeApiService PokeApiService
 
 <PageTitle>Generations</PageTitle>
 
-<h3>Species</h3>
+<h3>@Pokemon.Name</h3>
+
+<div class="species-hero">
+    <SpeciesCard Pokemon="Pokemon"></SpeciesCard>
+</div>
 
 @code {
+    private Pokemon Pokemon = new();
     
+    [Parameter]
+    public string Id { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Pokemon = await PokeApiService.GetPokemonAsync(Id);
+    }
+
 }

@@ -10,6 +10,8 @@ public class PokeApiService
     private static readonly Regex PokemonIdFromUrl = new Regex(@"\/(?<id>\d+)\/", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
     private static string GetIdFromUrl(string url) => PokemonIdFromUrl.Match(url).Groups["id"].Value;
 
+    private List<Pokemon> _pokemons = new();
+
     private int[][] _generations = new int[][] { new[] { 0 }, // generation 0 does not have a populationCount
         new[] {0, 151 }, new []{151, 100}, new []{251, 135}, // { where the generation starts, how many pokemon in the generation }
         new []{386, 107}, new []{493, 156}, new []{649, 72}, 
@@ -60,38 +62,54 @@ public class PokeApiService
 
     public async Task<List<Pokemon>> GetAllPokemonAsync()
     {
-        var species = new List<PokemonSpecies>();
+        if (_pokemons.Count == 0)
+        {
+            await GetAllPokemonFromApiAsync();
+        }
+
+        return _pokemons;
+    }
+
+    public async Task<Pokemon> GetPokemonAsync(string id)
+    {
+        if (_pokemons.Count == 0)
+        {
+            await GetAllPokemonFromApiAsync();
+        }
+
+        return _pokemons.FirstOrDefault(p => p.Id == id) ?? new();
+    }
+
+
+    private async Task GetAllPokemonFromApiAsync()
+    {
+        var species = new List<SpeciesResponse>();
         var result = new List<Pokemon>();
+        
         var url = "https://pokeapi.co/api/v2/pokemon-species?limit=100000";
-
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-
         var client = _clientFactory.CreateClient();
-
         var response = await client.SendAsync(request);
 
-        var strResponse = await response.Content.ReadAsStringAsync();
         if (response.IsSuccessStatusCode)
         {
             try
             {
-               var apiResponse = await response.Content.ReadFromJsonAsync<PokemonApiResponse>();
-               species = apiResponse?.Results ?? new();
+                var apiResponse = await response.Content.ReadFromJsonAsync<PokemonApiResponse>();
+                species = apiResponse?.Results ?? new();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
-            
         }
+
         foreach (var specimen in species)
         {
             result.Add(new Pokemon(GetIdFromUrl(specimen.url), specimen.name));
         }
 
-        return result;
+        _pokemons = result;
     }
-
-
 }

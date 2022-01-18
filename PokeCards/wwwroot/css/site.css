@@ -91,6 +91,7 @@ a, .btn-link {
 .species-card {
     position: relative;
     display: inline-block;
+    width: 100%;
     outline: 1px solid rgba(46,3,98,0.5);
     padding: 1rem .5rem 1rem .5rem;
     border-radius: .5rem;
@@ -325,5 +326,11 @@ a, .btn-link {
 }
 .switch input[type=radio]:not(:checked), .switch input[type=radio]:checked {
     display: none;
+}
+
+/* Species.razor.css */
+
+.species-hero {
+    max-width: 300px;
 }
 

@@ -21,13 +21,14 @@
     <div class="pokemon-list">
         @foreach (var pokemon in _pokemons)
         {
-            <div class="card-wrapper">
+            <SpeciesCard Pokemon="pokemon"></SpeciesCard>
+            @*<div class="card-wrapper">
                 <a class="species-card" href="species/@pokemon.Id">
                     <img src="Images/Species/@(pokemon.Id).png" alt="@pokemon.Name" class="img img-pokemon"/>
                     <p class="pokemon-id">#@pokemon.Id</p>
                     <h5 class="pokemon-name">@pokemon.Name</h5>
                 </a>
-            </div>
+            </div>*@
         }
     </div>
 </div>
