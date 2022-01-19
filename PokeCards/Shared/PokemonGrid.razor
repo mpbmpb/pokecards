@@ -1,0 +1,16 @@
+@using PokeCards.Data
+
+<div class="pokemon-container"> 
+    <div class="pokemon-list">
+        @foreach (var pokemon in Pokemons)
+        {
+            <SpeciesCard Pokemon="pokemon"></SpeciesCard>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<Pokemon> Pokemons { get; set; }
+    
+}

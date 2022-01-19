@@ -4,7 +4,7 @@
 
 .top-row {
     height: 3.5rem;
-    background: linear-gradient(180deg, rgba(111,23,245,1) 0%, rgba(59,4,125,1) 100%);
+    background: linear-gradient(180deg, hsl(264, 92%, 53%) 0%, hsl(267, 94%, 25%) 100%);
 }
 
 .navbar-brand {
@@ -14,40 +14,33 @@
 .oi {
     width: 2rem;
     font-size: 1.1rem;
-    vertical-align: text-top;
+    vertical-align: middle;
     top: -2px;
 }
 
 .nav-item {
+    display: flex;
+    place-items: center;
     font-size: 0.9rem;
-    padding-bottom: 0.5rem;
+    width: 75%;
+    height: 2rem;
+    margin: 1.5rem auto;
+    border-radius: 1000vw;
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow:  5px 5px 10px hsl(231, 60%, 36%), -5px -5px 10px hsl(226, 73%, 55%);
 }
-
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
-
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
-
-    .nav-item ::deep a {
-        color: #d7d7d7;
-        border-radius: 4px;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        line-height: 3rem;
-    }
+.nav-item:focus-within {
+    box-shadow:  inset 3px 3px 6px hsl(231, 60%, 36%), inset -5px -5px 12px hsl(226, 73%, 55%);
+}
 
 .nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.25);
     color: white;
 }
 
-.nav-item ::deep a:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
+.nav-item:hover .oi {
+    color: var(--hover-color);
 }
 
 @media (min-width: 720px) {
@@ -58,5 +51,12 @@
     .collapse {
         /* Never collapse the sidebar for wide screens */
         display: block;
+    }
+}
+
+@media (max-width: 719.98px) {
+    .nav-item {
+        max-width: 150px;
+        min-width: 120px;
     }
 }

@@ -7,12 +7,15 @@
 
 <PageTitle>Generations</PageTitle>
 
-<h3>@Pokemon.Name</h3>
+<h2>@Pokemon.Name</h2>
+
+<h4> Evolves from: </h4>
 
 <div class="species-hero">
-    <SpeciesCard Pokemon="Pokemon"></SpeciesCard>
+    <SpeciesCard Pokemon="Pokemon" AlwaysInFocus="true"></SpeciesCard>
 </div>
 
+<h4>Evolves to:</h4>
 @code {
     private Pokemon Pokemon = new();
     

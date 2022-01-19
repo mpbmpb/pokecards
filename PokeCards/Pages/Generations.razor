@@ -8,30 +8,16 @@
 
 <h1>Generations</h1>
 
-<div class="switch">
+<div class="radio-panel">
     @for (var gen = 1; gen < 9; gen++)
     {
-        <input type="radio" name="switch" id="@("s" + gen)" value="@gen" @onchange="RadioSelect"/>
+        <input type="radio" name="switch" id="@("s" + gen)" value="@gen" @onchange="RadioSelect" checked ="@(gen == 1)"/>
         <label for="@("s" + gen)" class="switch-label">@gen</label>
     }
     <div class="switch-indicator"><span class="switch-shadow"></span></div>
 </div>
 
-<div class="pokemon-container"> 
-    <div class="pokemon-list">
-        @foreach (var pokemon in _pokemons)
-        {
-            <SpeciesCard Pokemon="pokemon"></SpeciesCard>
-            @*<div class="card-wrapper">
-                <a class="species-card" href="species/@pokemon.Id">
-                    <img src="Images/Species/@(pokemon.Id).png" alt="@pokemon.Name" class="img img-pokemon"/>
-                    <p class="pokemon-id">#@pokemon.Id</p>
-                    <h5 class="pokemon-name">@pokemon.Name</h5>
-                </a>
-            </div>*@
-        }
-    </div>
-</div>
+<PokemonGrid Pokemons="_pokemons"></PokemonGrid>
 
 
 @code
@@ -57,10 +43,5 @@
             _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
         }
     }
-
-
-    private void SetHref(string id)
-    {
-        NavigationManager.NavigateTo($"/species/{id}");
-    }
+    
 }

@@ -1,0 +1,15 @@
+
+.species-hero {
+    max-width: 300px;
+}
+
+/*noinspection CssInvalidPseudoSelector*/
+::deep p {
+    font-size: 1.2rem;
+    margin: 0.6rem;
+}
+
+/*noinspection CssInvalidPseudoSelector*/
+::deep h5 {
+    font-size: 2rem;
+}

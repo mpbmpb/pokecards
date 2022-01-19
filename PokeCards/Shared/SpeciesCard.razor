@@ -1,7 +1,7 @@
 @using PokeCards.Data
 
-<div class="card-wrapper">
-    <a class="species-card" href="species/@Pokemon.Id">
+<div class="card-wrapper" id="@(AlwaysInFocus ? "card-wrapper" : "")">
+    <a class="species-card" href="species/@Pokemon.Id" id="@(AlwaysInFocus ? "card-wrapper" : "")">
         <img src="Images/Species/@(Pokemon.Id).png" alt="@Pokemon.Name" class="img img-pokemon"/>
         <p class="pokemon-id">#@Pokemon.Id</p>
         <h5 class="pokemon-name">@Pokemon.Name</h5>
@@ -12,5 +12,8 @@
 
     [Parameter]
     public Pokemon Pokemon { get; set; } = new();
+
+    [Parameter]
+    public bool AlwaysInFocus { get; set; }
 
 }
