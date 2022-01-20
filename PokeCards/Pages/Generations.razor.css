@@ -88,69 +88,62 @@
 }
 
 /*      -       animate magnification       -       */
-.radio-panel input#s1:checked ~ .switch-label[for="s1"] {
+input#s1:checked ~ .switch-label[for="s1"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
-.radio-panel input#s2:checked ~ .switch-label[for="s2"] {
+input#s2:checked ~ .switch-label[for="s2"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
-.radio-panel input#s3:checked ~ .switch-label[for="s3"] {
+input#s3:checked ~ .switch-label[for="s3"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
-.radio-panel input#s4:checked ~ .switch-label[for="s4"] {
+input#s4:checked ~ .switch-label[for="s4"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
-.radio-panel input#s5:checked ~ .switch-label[for="s5"] {
+input#s5:checked ~ .switch-label[for="s5"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
-.radio-panel input#s6:checked ~ .switch-label[for="s6"] {
+input#s6:checked ~ .switch-label[for="s6"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
-.radio-panel input#s7:checked ~ .switch-label[for="s7"] {
+input#s7:checked ~ .switch-label[for="s7"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
-.radio-panel input#s8:checked ~ .switch-label[for="s8"] {
-    transform: scale(var(--magnification));
-    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
-}
-.radio-panel input#s9:checked ~ .switch-label[for="s9"] {
+input#s8:checked ~ .switch-label[for="s8"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
 
 
 /*  animate sliding  -  Set width of .switch-label and --label-width of .switch-indicator */
-.radio-panel input#s1:checked ~ .switch-indicator {
+input#s1:checked ~ .switch-indicator {
     transform: translateX(var(--indicator-initial-translateX));
 }
-.radio-panel input#s2:checked ~ .switch-indicator {
+input#s2:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width)));
 }
-.radio-panel input#s3:checked ~ .switch-indicator {
+input#s3:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 2 ));
 }
-.radio-panel input#s4:checked ~ .switch-indicator {
+input#s4:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 3 ));
 }
-.radio-panel input#s5:checked ~ .switch-indicator {
+input#s5:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 4 ));
 }
-.radio-panel input#s6:checked ~ .switch-indicator {
+input#s6:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 5 ));
 }
-.radio-panel input#s7:checked ~ .switch-indicator {
+input#s7:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 6 ));
 }
-.radio-panel input#s8:checked ~ .switch-indicator {
+input#s8:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 7 ));
-}
-.radio-panel input#s9:checked ~ .switch-indicator {
-    transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 8 ));
 }

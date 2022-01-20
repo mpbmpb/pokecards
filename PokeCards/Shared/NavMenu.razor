@@ -1,4 +1,7 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using PokeCards.Data
+@inject NavigationManager NavigationManager
+
+
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">PokeCards</a>
@@ -9,22 +12,36 @@
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <button  class="nav-item px-3" onclick="@(() => NavigationManager.NavigateTo("/"))">
-            <div class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span>
-            </div>
-        </button>
-        <button class="nav-item px-3" onclick="@(() => NavigationManager.NavigateTo("/generations"))">
-            <div class="nav-link" href="generations">
-                <span class="oi oi-plus" aria-hidden="true"></span>
-            </div>
-        </button>
-        <button class="nav-item px-3" onclick="@(() => NavigationManager.NavigateTo("/fetchdata"))">
-            <div class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span>
-            </div>
-        </button>
+    <nav class="nav-bar flex-column">
+        
+        <input type="radio" class="nav-link" id="home" name="nav-switch" value="/" @onchange="RadioSelect" checked="@true"/>
+        <label for="home" class="nav-item" id="btn-home">
+            <span class="nav-icon oi oi-home" aria-hidden="true">
+                <span class="nav-icon nav-icon-glow oi oi-home" aria-hidden="true"></span>
+            </span>
+        </label>
+
+        <input type="radio" class="nav-link" id="generations" name="nav-switch" value="/generations" @onchange="RadioSelect"/>
+        <label for="generations" class="nav-item" id="btn-generations">
+            <span class="nav-icon oi oi-list-rich" aria-hidden="true">
+                <span class="nav-icon nav-icon-glow oi oi-list-rich" aria-hidden="true"></span>
+            </span>
+        </label>
+
+        <input type="radio" class="nav-link" id="favorites" name="nav-switch" value="/favorites" @onchange="RadioSelect"/>
+        <label for="favorites" class="nav-item" id="btn-favorites">
+            <span class="nav-icon oi oi-heart" aria-hidden="true">
+                <span class="nav-icon nav-icon-glow oi oi-heart" aria-hidden="true"></span>
+            </span>
+        </label>
+
+        <input type="radio" class="nav-link" id="search" name="nav-switch" value="/fetchdata" @onchange="RadioSelect"/>
+        <label for="search" class="nav-item" id="btn-search">
+            <span class="nav-icon oi oi-magnifying-glass" aria-hidden="true">
+                <span class="nav-icon nav-icon-glow oi oi-magnifying-glass" aria-hidden="true"><svg></svg></span>
+            </span>
+        </label>
+        
     </nav>
 </div>
 
@@ -38,4 +55,36 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
+}
+
+@* <div class="radio-panel"> *@
+@*     @for (var gen = 1; gen < 9; gen++) *@
+@*     { *@
+@*         <input type="radio" class="nav-item" name="switch" id="home" value="/" @onchange="RadioSelect" checked="@true"/> *@
+@*         <label for="home" class="nav-item-label"><span class="oi oi-home" aria-hidden="true"></span></label> *@
+@*     } *@
+@*     <div class="switch-indicator"><span class="switch-shadow"></span></div> *@
+@* </div> *@
+
+
+@code
+{
+    private int _selectedGeneration = 1;
+    private string _link = "";
+    private List<Pokemon> _pokemonList = new ();
+    private IEnumerable<Pokemon> _pokemons = ArraySegment<Pokemon>.Empty;
+    
+
+    private void RadioSelect(ChangeEventArgs args)
+    {
+        NavigationManager.NavigateTo(args.Value?.ToString() ?? "/");
+        
+        // int.TryParse(args.Value.ToString(), out _selectedGeneration);
+        // if (_selectedGeneration is > 0 and < 9)
+        // {
+        //     var generation = PokeApiService.GenerationRange(_selectedGeneration);
+        //     _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
+        // }
+    }
+    
 }

@@ -11,16 +11,41 @@
     font-size: 1.1rem;
 }
 
-.oi {
+.nav-icon {
+    position: relative;
     width: 2rem;
     font-size: 1.1rem;
-    vertical-align: middle;
-    top: -2px;
+    /*vertical-align: middle;*/
+    /*margin: .2rem auto;*/
+    /*text-align: center;*/
+    top: -0.07rem;
+    left: .2rem;
+    z-index: 2;
+}
+
+.nav-icon-glow {
+    position: absolute;
+    display: inline-block;
+    top: 0;
+    left: 0;
+    width: 2rem;
+    font-size: 1.1rem;
+    /*vertical-align: middle;*/
+    z-index: 1;
+    color: transparent;
+    /*margin: 0;*/
+}
+
+/*      -       hide checkboxes       -        */
+.nav-bar input[type=radio]:not(:checked), .nav-bar input[type=radio]:checked {
+    display: none;
 }
 
 .nav-item {
     display: flex;
     place-items: center;
+    justify-content: center;
+    /*align-content: center;*/
     font-size: 0.9rem;
     width: 75%;
     height: 2rem;
@@ -29,18 +54,52 @@
     background: transparent;
     border: none;
     outline: none;
+    color: hsl(231, 60%, 36%);
     box-shadow:  5px 5px 10px hsl(231, 60%, 36%), -5px -5px 10px hsl(226, 73%, 55%);
 }
-.nav-item:focus-within {
+
+.nav-item:hover .nav-icon {
+    color: hsl(157, 100%, 50%);
+}
+
+input#home:checked ~ #btn-home {
     box-shadow:  inset 3px 3px 6px hsl(231, 60%, 36%), inset -5px -5px 12px hsl(226, 73%, 55%);
+    color: #0095ff;
 }
 
-.nav-item ::deep a.active {
-    color: white;
+input#home:checked ~ #btn-home  .nav-icon-glow {
+    text-shadow: 0 0 1px #52fafa, 0 0 2px #52fafa, 0 0 4px rgba(82, 250, 250, 0.84), 
+        0 0 8px rgba(82, 250, 250, 0.65), 0 0 12px rgba(82, 250, 250, 0.48), 0 0 16px rgba(82, 250, 250, 0.49);
 }
 
-.nav-item:hover .oi {
-    color: var(--hover-color);
+input#generations:checked ~ #btn-generations {
+    box-shadow:  inset 3px 3px 6px hsl(231, 60%, 36%), inset -5px -5px 12px hsl(226, 73%, 55%);
+    color: #0095ff;
+}
+
+input#generations:checked ~ #btn-generations .nav-icon-glow {
+    text-shadow: 0 0 1px #51faf9, 0 0 2px #51faf9, 0 0 4px rgba(81, 250, 249, 0.84), 
+        0 0 8px rgba(81, 250, 249, 0.65), 0 0 12px rgba(81, 250, 249, 0.48), 0 0 16px rgba(81, 250, 249, 0.49);
+}
+
+input#favorites:checked ~ #btn-favorites {
+    box-shadow:  inset 3px 3px 6px hsl(231, 60%, 36%), inset -5px -5px 12px hsl(226, 73%, 55%);
+    color: #0095ff;
+}
+
+input#favorites:checked ~ #btn-favorites .nav-icon-glow {
+    text-shadow: 0 0 1px #51faf9, 0 0 2px #51faf9, 0 0 4px rgba(81, 250, 249, 0.84),
+        0 0 8px rgba(81, 250, 249, 0.65), 0 0 12px rgba(81, 250, 249, 0.48), 0 0 16px rgba(81, 250, 249, 0.49);
+}
+
+input#search:checked ~ #btn-search {
+    box-shadow:  inset 3px 3px 6px hsl(231, 60%, 36%), inset -5px -5px 12px hsl(226, 73%, 55%);
+    color: #0095ff;
+}
+
+input#search:checked ~ #btn-search .nav-icon-glow {
+    text-shadow: 0 0 1px #51faf9, 0 0 2px #51faf9, 0 0 4px rgba(81, 250, 249, 0.84),
+        0 0 8px rgba(81, 250, 249, 0.65), 0 0 12px rgba(81, 250, 249, 0.48), 0 0 16px rgba(81, 250, 249, 0.49);
 }
 
 @media (min-width: 720px) {
