@@ -1,6 +1,26 @@
 @page "/favorites"
+@using PokeCards.Services
+@inject ImageFetchingService ImageService
+
 <h3>Favorites</h3>
 
-@code {
-    
+
+<img src="@imagePngDataURL[0]" alt="">
+
+
+
+@code
+{
+    string[] imagePngDataURL = new string[100];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadImageAsync();
+    }
+
+    private async Task LoadImageAsync( )
+    {
+        imagePngDataURL[0] = await ImageService.GetPngImage("https://cdn.traction.one/pokedex/pokemon/1.png");
+    }
+
 }

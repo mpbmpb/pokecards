@@ -3,7 +3,7 @@
 @using PokeCards.Data
 @using System.Reflection.Metadata
 @using PokeCards.Services
-@inject PokeApiService PokeApiService
+@inject PokeapiService _pokeapiService
 
 <PageTitle>Generations</PageTitle>
 
@@ -24,7 +24,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Pokemon = await PokeApiService.GetPokemonAsync(Id);
+        Pokemon = await _pokeapiService.GetPokemonAsync(Id);
     }
 
 }

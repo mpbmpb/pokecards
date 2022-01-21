@@ -6,8 +6,6 @@
     height: 3rem;
     padding: 0 1rem;
     border-radius: 1000vw;
-    /*background: transparent;*/
-    /*box-shadow:  5px 5px 10px #2a4bc2 inset, -5px -5px 10px #4073ff inset;*/
     background: linear-gradient(177deg, hsl(264, 92%, 53%) 0%, rgba(59,4,125,1) 100%);
     box-shadow: -9px -9px 16px hsla(225, 99%, 67%, 0.50), -1px -1px 0 hsla(264, 91%, 63%, 1.00), 9px 9px 16px #0008;
     z-index: 0;
@@ -120,6 +118,10 @@ input#s8:checked ~ .switch-label[for="s8"] {
     transform: scale(var(--magnification));
     transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
 }
+input#s9:checked ~ .switch-label[for="s9"] {
+    transform: scale(var(--magnification));
+    transition: transform 400ms cubic-bezier(.71,.04,.55,.9);
+}
 
 
 /*  animate sliding  -  Set width of .switch-label and --label-width of .switch-indicator */
@@ -146,4 +148,7 @@ input#s7:checked ~ .switch-indicator {
 }
 input#s8:checked ~ .switch-indicator {
     transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 7 ));
+}
+input#s9:checked ~ .switch-indicator {
+    transform: translateX(calc(var(--indicator-initial-translateX) + var(--label-width) * 8 ));
 }

@@ -22,7 +22,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services
     .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<PokeApiService>();
+builder.Services.AddSingleton<PokeapiService>();
+builder.Services.AddSingleton<ImageFetchingService>();
 builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();

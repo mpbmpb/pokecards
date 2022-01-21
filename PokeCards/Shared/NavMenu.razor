@@ -57,16 +57,6 @@
 
 }
 
-@* <div class="radio-panel"> *@
-@*     @for (var gen = 1; gen < 9; gen++) *@
-@*     { *@
-@*         <input type="radio" class="nav-item" name="switch" id="home" value="/" @onchange="RadioSelect" checked="@true"/> *@
-@*         <label for="home" class="nav-item-label"><span class="oi oi-home" aria-hidden="true"></span></label> *@
-@*     } *@
-@*     <div class="switch-indicator"><span class="switch-shadow"></span></div> *@
-@* </div> *@
-
-
 @code
 {
     private int _selectedGeneration = 1;
@@ -78,13 +68,6 @@
     private void RadioSelect(ChangeEventArgs args)
     {
         NavigationManager.NavigateTo(args.Value?.ToString() ?? "/");
-        
-        // int.TryParse(args.Value.ToString(), out _selectedGeneration);
-        // if (_selectedGeneration is > 0 and < 9)
-        // {
-        //     var generation = PokeApiService.GenerationRange(_selectedGeneration);
-        //     _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
-        // }
     }
     
 }

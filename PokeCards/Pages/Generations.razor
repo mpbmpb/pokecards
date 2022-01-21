@@ -1,7 +1,7 @@
 @page "/generations"
 @using PokeCards.Services
 @using PokeCards.Data
-@inject PokeApiService PokeApiService 
+@inject PokeapiService _pokeapiService 
 @inject NavigationManager NavigationManager
 
 <PageTitle>Generations</PageTitle>
@@ -29,8 +29,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _pokemonList = await PokeApiService.GetAllPokemonAsync();
-        var generation = PokeApiService.GenerationRange(_selectedGeneration);
+        _pokemonList = await _pokeapiService.GetAllPokemonAsync();
+        var generation = _pokeapiService.GenerationRange(_selectedGeneration);
         _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
     }
 
@@ -39,7 +39,7 @@
         int.TryParse(args.Value.ToString(), out _selectedGeneration);
         if (_selectedGeneration is > 0 and < 9)
         {
-            var generation = PokeApiService.GenerationRange(_selectedGeneration);
+            var generation = _pokeapiService.GenerationRange(_selectedGeneration);
             _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
         }
     }
