@@ -24,6 +24,7 @@ builder.Services
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<PokeapiService>();
 builder.Services.AddSingleton<ImageFetchingService>();
+builder.Services.AddSingleton<PokemontcgService>();
 builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();

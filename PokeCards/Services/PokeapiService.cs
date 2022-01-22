@@ -6,6 +6,7 @@ namespace PokeCards.Services;
 
 public class PokeapiService
 {
+    private const string _speciesUrl = "https://pokeapi.co/api/v2/pokemon-species?limit=100000";
     private readonly IHttpClientFactory _clientFactory;
     
     private static readonly Regex PokemonIdFromUrl = new Regex(@"\/(?<id>\d+)\/", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
@@ -51,9 +52,8 @@ public class PokeapiService
     {
         var species = new List<SpeciesResponse>();
         var result = new List<Pokemon>();
-        
-        var url = "https://pokeapi.co/api/v2/pokemon-species?limit=100000";
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, _speciesUrl);
         var client = _clientFactory.CreateClient();
         var response = await client.SendAsync(request);
 

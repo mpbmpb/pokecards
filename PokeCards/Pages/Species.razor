@@ -1,9 +1,9 @@
 @page "/species"
 @page "/species/{Id}"
 @using PokeCards.Data
-@using System.Reflection.Metadata
 @using PokeCards.Services
 @inject PokeapiService _pokeapiService
+@inject PokemontcgService _pokemontcgService;
 
 <PageTitle>Generations</PageTitle>
 
@@ -16,8 +16,23 @@
 </div>
 
 <h4>Evolves to:</h4>
+
+<h4>Cards:</h4>
+
+<div class="card-list">
+    @foreach (var card in Cards)
+    {
+        <img src="@card.ImageUrl"/>
+        <p>@card.Name</p>
+    }
+</div>
+
+<hr/>
+
+
 @code {
     private Pokemon Pokemon = new();
+    private List<Card> Cards = new();
     
     [Parameter]
     public string Id { get; set; } = "";
@@ -25,6 +40,7 @@
     protected override async Task OnInitializedAsync()
     {
         Pokemon = await _pokeapiService.GetPokemonAsync(Id);
+        Cards = await _pokemontcgService.GetAllCardsWithAsync(Id);
     }
 
 }

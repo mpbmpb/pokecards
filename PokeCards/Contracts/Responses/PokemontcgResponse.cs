@@ -4,12 +4,9 @@ namespace PokeCards.Contracts.Responses;
 
 public class PokemontcgResponse
 {
-    [JsonPropertyName("id")] public string Id { get; set; }
-    [JsonPropertyName("name")] public string Name { get; set; }
-    [JsonPropertyName("supertype")] public string Supertype { get; set; } // pokemon energy or trainer
-    [JsonPropertyName("types")] public string[] Types { get; set; }
-    [JsonPropertyName("images")]public PokemontcgImages Images { get; set; }
-    
+    [JsonPropertyName("data")] public PokemontcgCardResponse[]? Data { get; set; }
+    [JsonPropertyName("page")] public int? Page { get; set; }
+    [JsonPropertyName("pageSize")] public int? PageSize { get; set; }
+    [JsonPropertyName("count")] public int? Count { get; set; }
+    [JsonPropertyName("totalCount")] public int? TotalCount { get; set; }
 }
-
-public record PokemontcgImages(string small, string large);

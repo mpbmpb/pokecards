@@ -20,7 +20,7 @@ public class PokemonTypes
     public static PokemonType Rock = new("Rock", "Images/Logos/Icon_Rock.svg.png");
     public static PokemonType Steel = new("Steel", "Images/Logos/Icon_Steel.svg.png");
     public static PokemonType Water = new("Water", "Images/Logos/Icon_Water.svg.png");
-
+//TODO add supertypes pokemon, enery & trainer 
     public static List<PokemonType> GetAll() => new List<PokemonType>
     {
         Bug, Dark, Dragon, Electric, Fairy, Fighting, Fire, Flying, Ghost, 
