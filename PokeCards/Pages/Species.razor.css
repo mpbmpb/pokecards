@@ -13,3 +13,25 @@
 ::deep h5 {
     font-size: 2rem;
 }
+
+.card-grid-container {
+    width: 100%;
+}
+.card-list {
+    padding: 2rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 2rem;
+}
+
+.card {
+    background: transparent;
+    border: none;
+}
+
+@media (max-width: 399px) {
+    .card-list {
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 1rem;
+    }
+}

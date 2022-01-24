@@ -8,6 +8,8 @@ public class PokemontcgCardResponse
     [JsonPropertyName("name")] public string? Name { get; set; }
     [JsonPropertyName("supertype")] public string? Supertype { get; set; } // pokemon energy or trainer
     [JsonPropertyName("types")] public string[]? Types { get; set; }
+    
+    [JsonPropertyName("nationalPokedexNumbers")] public int[]? PokedexNumbers { get; set; }
     [JsonPropertyName("images")]public PokemonCardImageUrls? Images { get; set; }
     
 }

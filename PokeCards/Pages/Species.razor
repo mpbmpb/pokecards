@@ -1,7 +1,8 @@
 @page "/species"
-@page "/species/{Id}"
+@page "/species/{Id:int}"
 @using PokeCards.Data
 @using PokeCards.Services
+@using System.Diagnostics
 @inject PokeapiService _pokeapiService
 @inject PokemontcgService _pokemontcgService;
 
@@ -19,28 +20,48 @@
 
 <h4>Cards:</h4>
 
-<div class="card-list">
-    @foreach (var card in Cards)
-    {
-        <img src="@card.ImageUrl"/>
-        <p>@card.Name</p>
-    }
+<div class="card-grid-container">
+    <div class="card-list">
+        @foreach (var card in Cards)
+        {
+            <div class="card">
+                <img src="@card.ImageUrl" alt=""/>
+                <p>@card.Name</p>
+            </div>
+        }
+    </div>
 </div>
 
-<hr/>
+
 
 
 @code {
     private Pokemon Pokemon = new();
     private List<Card> Cards = new();
+    private Stopwatch firstSw = new();
+    private Stopwatch sw = new ();
     
     [Parameter]
-    public string Id { get; set; } = "";
+    public int Id { get; set; } = 0;
 
     protected override async Task OnInitializedAsync()
     {
+        firstSw.Start();
         Pokemon = await _pokeapiService.GetPokemonAsync(Id);
-        Cards = await _pokemontcgService.GetAllCardsWithAsync(Id);
+        Cards = await _pokemontcgService.GetAllCardsWithAsync(Id); //TODO implement caching with resilience
+        sw.Start();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            sw.Stop();
+            firstSw.Stop();
+            Console.WriteLine($"Render took: {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Page took in total: {firstSw.ElapsedMilliseconds} ms");
+        }
+        return base.OnAfterRenderAsync(firstRender);
     }
 
 }
