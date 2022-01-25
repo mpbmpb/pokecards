@@ -1,6 +1,12 @@
 using System.Diagnostics;
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using PokeCards.Contracts.Responses;
 using PokeCards.Data;
+using Polly;
+using Polly.Contrib.WaitAndRetry;
+using Polly.Extensions.Http;
+using Polly.Wrap;
 
 namespace PokeCards.Services;
 
@@ -11,7 +17,7 @@ public class PokemontcgService
     private const int MaxPageSize = 250;
     public const int MaxParallelRequests = 60;
     private readonly IHttpClientFactory _clientFactory;
-    private PokemontcgResponse _apiResponse = new();
+    private readonly AsyncPolicyWrap<HttpResponseMessage> _policy;
     private List<Card> _cards = new();
     private Object _padLock = new();
 
@@ -19,148 +25,133 @@ public class PokemontcgService
     {
         _clientFactory = clientFactory;
         _pokeapiService = pokeapiService;
+        _policy = GetHttpPolicy();
+    }
+
+    private static AsyncPolicyWrap<HttpResponseMessage> GetHttpPolicy()
+    {
+        var fallBackPolicy = Policy.HandleResult<HttpResponseMessage>(r =>
+                !r.IsSuccessStatusCode).Or<Exception>()
+            .FallbackAsync(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+        var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5);
+        var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(5);
+        var retryPolicy = Policy.HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode).Or<Exception>()
+            .WaitAndRetryAsync(delay);
+        var circuitBreaker = Policy.HandleResult<HttpResponseMessage>(r =>
+                !r.IsSuccessStatusCode).Or<Exception>()
+            .AdvancedCircuitBreakerAsync(0.7, TimeSpan.FromSeconds(10), 8, TimeSpan.FromMinutes(1));
+
+        var policy = fallBackPolicy.WrapAsync(retryPolicy).WrapAsync(timeoutPolicy).WrapAsync(circuitBreaker);
+        return policy;
     }
 
     public async Task<List<Card>> GetAllCardsWithAsync(int speciesId)
     {
         var sw = new Stopwatch();
         sw.Start();
-        _cards = new();
+        _cards = new List<Card>();
+        var responses = new List<HttpResponseMessage?>();
         var totalCount = 80;
         var pageSize = 16;
         var page = 1;
+        var running = true;
         
-        while (_cards.Count < totalCount)
+        while (_cards.Count < totalCount && running)
         {
-            var tasks = new List<Task>();
             var requests = (totalCount - _cards.Count) / pageSize;
             if (totalCount % pageSize != 0)
                 requests++;
+            var tasks = new Task[requests];
 
             for (int i = 0; i < requests; i++)
             {
-                tasks.Add(Task.Run(async () =>
+                tasks[i] = Task.Run(async () =>
                 {
                     var response = await GetCardsPageForAsync(speciesId, pageSize, page++);
-                    await ExtractCards(response);
-                    Console.WriteLine($"cards in memory: {_cards.Count}");
-                }));
+                    lock(_padLock)
+                    {
+                        responses.Add(response);
+                    }
+                });
             }
             await Task.WhenAll(tasks);
-        }
-        sw.Stop();
-
-        
-
-        async Task ExtractCards(HttpResponseMessage httpResponseMessage)
-        {
-            var parsed = await TryParseResponseAsync(httpResponseMessage);
-            if (parsed)
+            foreach (var response in responses)
             {
-                await AddCardsAsync(_apiResponse.Data ?? Array.Empty<PokemontcgCardResponse>());
-                if (_apiResponse.TotalCount != totalCount)
-                    Interlocked.Exchange(ref totalCount, _apiResponse.TotalCount ?? totalCount);
+                if (!response!.IsSuccessStatusCode)
+                {
+                    running = false;
+                    continue;
+                }
+                var responseCount =  await ExtractCards(response!);
+                totalCount = responseCount;
             }
         }
-
+        
+        sw.Stop();
         Console.WriteLine($"Total time to get cards: {sw.ElapsedMilliseconds} ms");
         return _cards;
     }
 
-    public async Task GetAllCardsAsync()
+    private async Task<HttpResponseMessage> GetCardsPageForAsync(int id, int pageSize,int page)
     {
-        _cards = new();
-        var totalCount = 14410;
-        var page = 1;
-        
-
-        while (_cards.Count < totalCount)
-        {
-            var tasks = new List<Task>();
-            var requests = Math.Min((totalCount - _cards.Count) / MaxPageSize, MaxParallelRequests);
-            if (totalCount % MaxPageSize != 0)
-                requests++;
-
-            for (int i = 0; i < requests; i++)
-            {
-                tasks.Add(Task.Run( async () =>
-                {
-                    var response = await GetCardsPageAsync(page++);
-                    await ExtractCards(response);
-                    Console.WriteLine($"cards in memory: {_cards.Count}");
-                }));
-            }
-            await Task.WhenAll(tasks);
-        }
-
-        
-
-        async Task ExtractCards(HttpResponseMessage httpResponseMessage)
-        {
-            var parsed = await TryParseResponseAsync(httpResponseMessage);
-            if (parsed)
-            {
-                await AddCardsAsync(_apiResponse.Data ?? Array.Empty<PokemontcgCardResponse>());
-                Interlocked.Exchange(ref totalCount, _apiResponse.TotalCount ?? totalCount);
-            }
-        }
-    }
-
-    private async Task<HttpResponseMessage> GetCardsPageAsync(int page)
-    {
-        var baseUrl = $"https://api.pokemontcg.io/v2/cards?pageSize={MaxPageSize}&page=";
-        var request = new HttpRequestMessage(HttpMethod.Get, baseUrl + page);
-        var client = _clientFactory.CreateClient();
-        var response = await client.SendAsync(request);
+        var url = $"https://api.pokemontcg.io/v2/cards?q=nationalPokedexNumbers:{id}&pageSize={pageSize}&page={page}";
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        using var client = _clientFactory.CreateClient();
+        var response = await _policy.ExecuteAsync(async () => await client.SendAsync(request));
         return response;
     }
 
- private async Task<HttpResponseMessage> GetCardsPageForAsync(int id, int pageSize,int page)
+    private async Task<int> ExtractCards(HttpResponseMessage httpResponseMessage)
     {
-        var baseUrl = $"https://api.pokemontcg.io/v2/cards?q=nationalPokedexNumbers:{id}&pageSize={pageSize}&page={page}";
-        var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
-        var client = _clientFactory.CreateClient();
-        var response = await client.SendAsync(request);
-        return response;
+        if (!httpResponseMessage.IsSuccessStatusCode)
+            return 0;
+            
+        var (success, tcgResponse) = await TryParseResponseAsync(httpResponseMessage);
+        if (!success)
+            return 0;
+            
+        await AddCardsAsync(tcgResponse!.Data);
+        return tcgResponse.TotalCount ?? 0;
     }
 
-    private async Task<bool> TryParseResponseAsync(HttpResponseMessage response)
+    private async Task<(bool,PokemontcgResponse?)> TryParseResponseAsync(HttpResponseMessage response)
     {
         if (!response.IsSuccessStatusCode) 
-            return false;
+            return (false,null);
+        PokemontcgResponse tcgResponse;
         
         try
         {
-            _apiResponse = await response.Content.ReadFromJsonAsync<PokemontcgResponse>() ?? new();
+            tcgResponse = await response.Content.ReadFromJsonAsync<PokemontcgResponse>() ?? new();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            return (false, null);
         }
 
-        return true;
+        return (true, tcgResponse);
     }
 
-    private async Task AddCardsAsync(IEnumerable<PokemontcgCardResponse> cardResponses)
+    private async Task AddCardsAsync(IEnumerable<PokemontcgCardResponse>? cardResponses)
     {
+        if (cardResponses is null)
+            return;
+        
         var pokemons = await _pokeapiService.GetAllPokemonAsync();
         foreach (var cardResponse in cardResponses)
         {
-            lock (_padLock)
+            _cards.Add(new Card
             {
-                _cards.Add(new Card
-                {
-                    Id = cardResponse.Id ?? "",
-                    Name = cardResponse.Name ?? "",
-                    Supertype = cardResponse.Supertype ?? "",
-                    Types = cardResponse.Types ?? Array.Empty<string>(),
-                    Pokemons = cardResponse.PokedexNumbers?.Select(id => 
-                            pokemons.FirstOrDefault(p => p.Id == id) ?? new(0) )
-                        .Where(p => p.Id != 0).ToList() ?? new(),
-                    ImageUrl = cardResponse.Images?.small ?? cardResponse.Images?.large ?? ""
-                });
-            }
+                Id = cardResponse.Id ?? "",
+                Name = cardResponse.Name ?? "",
+                Supertype = cardResponse.Supertype ?? "",
+                Types = cardResponse.Types ?? Array.Empty<string>(),
+                Pokemons = cardResponse.PokedexNumbers?.Select(id => 
+                        pokemons.FirstOrDefault(p => p.Id == id) ?? new(0) )
+                    .Where(p => p.Id != 0).ToList() ?? new(),
+                ImageUrl = cardResponse.Images?.small ?? cardResponse.Images?.large ?? ""
+            });
         }
     }
 }

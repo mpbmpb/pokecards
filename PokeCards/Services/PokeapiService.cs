@@ -58,7 +58,7 @@ public class PokeapiService
         var result = new List<Pokemon>();
 
         var request = new HttpRequestMessage(HttpMethod.Get, _speciesUrl);
-        var client = _clientFactory.CreateClient();
+        using var client = _clientFactory.CreateClient();
         var response = await client.SendAsync(request);
 
         if (response.IsSuccessStatusCode)

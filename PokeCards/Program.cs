@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using PokeCards.Areas.Identity;
 using PokeCards.Data;
 using PokeCards.Services;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
