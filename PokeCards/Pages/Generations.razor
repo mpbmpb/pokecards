@@ -31,7 +31,7 @@
     {
         _pokemonList = await _pokeapiService.GetAllPokemonAsync();
         var generation = _pokeapiService.GenerationRange(_selectedGeneration);
-        _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
+        _pokemons = _pokemonList.GetSafeRange(generation.offset, generation.populationCount);
     }
 
     private void RadioSelect(ChangeEventArgs args)
@@ -40,7 +40,7 @@
         if (_selectedGeneration is > 0 and < 9)
         {
             var generation = _pokeapiService.GenerationRange(_selectedGeneration);
-            _pokemons = _pokemonList.GetRange(generation.offset, generation.populationCount);
+            _pokemons = _pokemonList.GetSafeRange(generation.offset, generation.populationCount);
         }
     }
     

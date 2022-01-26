@@ -1,13 +1,10 @@
-using System.Text.RegularExpressions;using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using PokeCards.Areas.Identity;
+using PokeCards.Contracts;
 using PokeCards.Data;
 using PokeCards.Services;
-using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +20,8 @@ builder.Services.AddServerSideBlazor();
 builder.Services
     .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddHttpClient();
-builder.Services.AddHttpClient("Pokemontcg").AddPolicyHandler(PokemontcgService.GetHttpPolicy());
+builder.Services.AddHttpClient("Pokemontcg").AddPolicyHandler(Policies.PokemontcgPolicy);
+builder.Services.AddHttpClient("Pokeapi").AddPolicyHandler(Policies.PokeapiPolicy);
 builder.Services.AddSingleton<PokeapiService>();
 builder.Services.AddSingleton<ImageFetchingService>();
 builder.Services.AddScoped<PokemontcgService>();

@@ -1,12 +1,10 @@
 using System.Diagnostics;
 using System.Net;
-using Microsoft.AspNetCore.Mvc;
 using PokeCards.Contracts.Responses;
 using PokeCards.Data;
 using Polly;
 using Polly.CircuitBreaker;
 using Polly.Contrib.WaitAndRetry;
-using Polly.Extensions.Http;
 using Polly.Wrap;
 
 namespace PokeCards.Services;
@@ -15,67 +13,34 @@ public class PokemontcgService
 {
     private PokeapiService _pokeapiService;
     private readonly IHttpClientFactory _clientFactory;
-    private readonly AsyncPolicyWrap<HttpResponseMessage> _policy;
     private List<Card> _cards = new();
     private Object _padLock = new();
+    private const int _pageSize = 16;
 
     public PokemontcgService(IHttpClientFactory clientFactory, PokeapiService pokeapiService)
     {
         _clientFactory = clientFactory;
         _pokeapiService = pokeapiService;
-        _policy = GetHttpPolicy();
     }
 
-    public static AsyncPolicyWrap<HttpResponseMessage> GetHttpPolicy()
-    {
-        var fallBackPolicy = Policy.HandleResult<HttpResponseMessage>(r =>
-                !r.IsSuccessStatusCode).Or<Exception>()
-            .FallbackAsync(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
-        var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5);
-        var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(8);
-        var retryPolicy = Policy.HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
-            .Or<Exception>(e => e is not BrokenCircuitException)
-            .WaitAndRetryAsync(delay);
-        var circuitBreaker = Policy.HandleResult<HttpResponseMessage>(r =>
-                !r.IsSuccessStatusCode).Or<Exception>()
-            .AdvancedCircuitBreakerAsync(0.7, TimeSpan.FromSeconds(20), 12, TimeSpan.FromSeconds(40));
-
-        var policy = fallBackPolicy.WrapAsync(retryPolicy).WrapAsync(timeoutPolicy).WrapAsync(circuitBreaker);
-        return policy;
-    }
-
-    public async Task<List<Card>> GetAllCardsWithAsync(int speciesId)
+    public async Task<List<Card>> GetAllCardsForAsync(int speciesId)
     {
         var sw = new Stopwatch();
         sw.Start();
         _cards = new List<Card>();
         using var client = _clientFactory.CreateClient("Pokemontcg");
-        
-        var totalCount = 80;
-        var pageSize = 16;
-        var page = 1;
+
         var running = true;
-        
+        var totalCount = 80;
+        var startPage = 1;
+
         while (_cards.Count < totalCount && running)
         {
-            var requests = (totalCount - _cards.Count) / pageSize;
-            if (totalCount % pageSize != 0)
-                requests++;
-            var tasks = new Task[requests];
-            var responses = new List<HttpResponseMessage?>();
-
-            for (int i = 0; i < requests; i++)
-            {
-                tasks[i] = Task.Run(async () =>
-                {
-                    var response = await GetCardsPageForAsync(speciesId, pageSize, page++, client);
-                    lock(_padLock)
-                    {
-                        responses.Add(response);
-                    }
-                });
-            }
-            await Task.WhenAll(tasks);
+            var pages = (totalCount - _cards.Count) / _pageSize;
+            if (totalCount % _pageSize != 0)
+                pages++;
+            
+            var responses = await SendRequestsParallelAsync(client, speciesId, pages, startPage);
             foreach (var response in responses)
             {
                 if (!response!.IsSuccessStatusCode)
@@ -83,9 +48,11 @@ public class PokemontcgService
                     running = false;
                     continue;
                 }
-                var responseCount =  await ExtractCards(response!);
+                var responseCount =  await ExtractCards(response);
                 totalCount = responseCount;
             }
+
+            startPage += pages;
         }
         
         sw.Stop();
@@ -93,9 +60,30 @@ public class PokemontcgService
         return _cards;
     }
 
-    private async Task<HttpResponseMessage> GetCardsPageForAsync(int id, int pageSize,int page, HttpClient client)
+    private async Task<List<HttpResponseMessage?>> SendRequestsParallelAsync(HttpClient client, int speciesId, int pages, int startPage)
     {
-        var url = $"https://api.pokemontcg.io/v2/cards?q=nationalPokedexNumbers:{id}&pageSize={pageSize}&page={page}";
+        var tasks = new Task[pages];
+        var responses = new List<HttpResponseMessage?>();
+
+        for (int i = 0; i < pages; i++)
+        {
+            tasks[i] = Task.Run(async () =>
+            {
+                var response = await GetCardsPageForAsync(speciesId, startPage++, client);
+                lock (_padLock)
+                {
+                    responses.Add(response);
+                }
+            });
+        }
+
+        await Task.WhenAll(tasks);
+        return responses;
+    }
+
+    private async Task<HttpResponseMessage> GetCardsPageForAsync(int id, int page, HttpClient client)
+    {
+        var url = $"https://api.pokemontcg.io/v2/cards?q=nationalPokedexNumbers:{id}&pageSize={_pageSize}&page={page}";
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         var response = await client.SendAsync(request);
         return response;
@@ -103,9 +91,6 @@ public class PokemontcgService
 
     private async Task<int> ExtractCards(HttpResponseMessage httpResponseMessage)
     {
-        if (!httpResponseMessage.IsSuccessStatusCode)
-            return 0;
-            
         var (success, tcgResponse) = await TryParseResponseAsync(httpResponseMessage);
         if (!success)
             return 0;
@@ -114,12 +99,9 @@ public class PokemontcgService
         return tcgResponse.TotalCount ?? 0;
     }
 
-    private async Task<(bool,PokemontcgResponse?)> TryParseResponseAsync(HttpResponseMessage response)
+    private async Task<(bool, PokemontcgResponse?)> TryParseResponseAsync(HttpResponseMessage response)
     {
-        if (!response.IsSuccessStatusCode) 
-            return (false,null);
         PokemontcgResponse tcgResponse;
-        
         try
         {
             tcgResponse = await response.Content.ReadFromJsonAsync<PokemontcgResponse>() ?? new();
@@ -129,7 +111,6 @@ public class PokemontcgService
             Console.WriteLine(e);
             return (false, null);
         }
-
         return (true, tcgResponse);
     }
 

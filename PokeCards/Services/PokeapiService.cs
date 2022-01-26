@@ -24,13 +24,6 @@ public class PokeapiService
     public (int generation,int offset, int populationCount) GenerationRange(int gen) => gen > 0 && gen < _generations.Length ?
         (gen, _generations[gen][0], _generations[gen][1]) : (1, 0, 151);
 
-    private static int GetIdFromUrl(string url)
-    {
-        int id = 0;
-        int.TryParse(PokemonIdFromUrl.Match(url).Groups["id"].Value, out id);
-        return id;
-    }
-
     public async Task<List<Pokemon>> GetAllPokemonAsync()
     {
         if (_pokemons.Count == 0)
@@ -40,6 +33,7 @@ public class PokeapiService
 
         return _pokemons;
     }
+
 
     public async Task<Pokemon> GetPokemonAsync(int id)
     {
@@ -54,13 +48,18 @@ public class PokeapiService
 
     private async Task GetAllPokemonFromApiAsync()
     {
-        var species = new List<SpeciesResponse>();
-        var result = new List<Pokemon>();
-
         var request = new HttpRequestMessage(HttpMethod.Get, _speciesUrl);
-        using var client = _clientFactory.CreateClient();
+        using var client = _clientFactory.CreateClient("Pokeapi");
         var response = await client.SendAsync(request);
 
+        _pokemons = await ExtractPokemonAsync(response);
+    }
+
+    private static async Task<List<Pokemon>> ExtractPokemonAsync(HttpResponseMessage response)
+    {
+        var result = new List<Pokemon>();
+        var species = new List<SpeciesResponse>();
+        
         if (response.IsSuccessStatusCode)
         {
             try
@@ -80,6 +79,13 @@ public class PokeapiService
             result.Add(new Pokemon(GetIdFromUrl(specimen.url), specimen.name));
         }
 
-        _pokemons = result;
+        return result;
+    }
+
+    private static int GetIdFromUrl(string url)
+    {
+        int id = 0;
+        int.TryParse(PokemonIdFromUrl.Match(url).Groups["id"].Value, out id);
+        return id;
     }
 }

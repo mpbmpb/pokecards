@@ -1,6 +1,3 @@
-using PokeCards.Contracts.Responses;
-using PokeCards.Pages;
-
 namespace PokeCards.Data;
 
 public class Card

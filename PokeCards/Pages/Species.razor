@@ -48,7 +48,7 @@
     {
         firstSw.Start();
         Pokemon = await _pokeapiService.GetPokemonAsync(Id);
-        Cards = await _pokemontcgService.GetAllCardsWithAsync(Id); //TODO implement caching with resilience
+        Cards = await _pokemontcgService.GetAllCardsForAsync(Id); //TODO implement caching with resilience
         sw.Start();
     }
 
