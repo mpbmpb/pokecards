@@ -23,6 +23,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services
     .AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("Pokemontcg").AddPolicyHandler(PokemontcgService.GetHttpPolicy());
 builder.Services.AddSingleton<PokeapiService>();
 builder.Services.AddSingleton<ImageFetchingService>();
 builder.Services.AddScoped<PokemontcgService>();

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokeCards.Contracts.Responses;
 using PokeCards.Data;
 using Polly;
+using Polly.CircuitBreaker;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
 using Polly.Wrap;
@@ -13,9 +14,6 @@ namespace PokeCards.Services;
 public class PokemontcgService
 {
     private PokeapiService _pokeapiService;
-    private const string CardsBaseUrl = "https://api.pokemontcg.io/v2/cards?q=nationalPokedexNumbers:";
-    private const int MaxPageSize = 250;
-    public const int MaxParallelRequests = 60;
     private readonly IHttpClientFactory _clientFactory;
     private readonly AsyncPolicyWrap<HttpResponseMessage> _policy;
     private List<Card> _cards = new();
@@ -28,18 +26,19 @@ public class PokemontcgService
         _policy = GetHttpPolicy();
     }
 
-    private static AsyncPolicyWrap<HttpResponseMessage> GetHttpPolicy()
+    public static AsyncPolicyWrap<HttpResponseMessage> GetHttpPolicy()
     {
         var fallBackPolicy = Policy.HandleResult<HttpResponseMessage>(r =>
                 !r.IsSuccessStatusCode).Or<Exception>()
             .FallbackAsync(new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
         var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5);
-        var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(5);
-        var retryPolicy = Policy.HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode).Or<Exception>()
+        var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(8);
+        var retryPolicy = Policy.HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
+            .Or<Exception>(e => e is not BrokenCircuitException)
             .WaitAndRetryAsync(delay);
         var circuitBreaker = Policy.HandleResult<HttpResponseMessage>(r =>
                 !r.IsSuccessStatusCode).Or<Exception>()
-            .AdvancedCircuitBreakerAsync(0.7, TimeSpan.FromSeconds(10), 8, TimeSpan.FromMinutes(1));
+            .AdvancedCircuitBreakerAsync(0.7, TimeSpan.FromSeconds(20), 12, TimeSpan.FromSeconds(40));
 
         var policy = fallBackPolicy.WrapAsync(retryPolicy).WrapAsync(timeoutPolicy).WrapAsync(circuitBreaker);
         return policy;
@@ -50,7 +49,8 @@ public class PokemontcgService
         var sw = new Stopwatch();
         sw.Start();
         _cards = new List<Card>();
-        var responses = new List<HttpResponseMessage?>();
+        using var client = _clientFactory.CreateClient("Pokemontcg");
+        
         var totalCount = 80;
         var pageSize = 16;
         var page = 1;
@@ -62,12 +62,13 @@ public class PokemontcgService
             if (totalCount % pageSize != 0)
                 requests++;
             var tasks = new Task[requests];
+            var responses = new List<HttpResponseMessage?>();
 
             for (int i = 0; i < requests; i++)
             {
                 tasks[i] = Task.Run(async () =>
                 {
-                    var response = await GetCardsPageForAsync(speciesId, pageSize, page++);
+                    var response = await GetCardsPageForAsync(speciesId, pageSize, page++, client);
                     lock(_padLock)
                     {
                         responses.Add(response);
@@ -92,12 +93,11 @@ public class PokemontcgService
         return _cards;
     }
 
-    private async Task<HttpResponseMessage> GetCardsPageForAsync(int id, int pageSize,int page)
+    private async Task<HttpResponseMessage> GetCardsPageForAsync(int id, int pageSize,int page, HttpClient client)
     {
         var url = $"https://api.pokemontcg.io/v2/cards?q=nationalPokedexNumbers:{id}&pageSize={pageSize}&page={page}";
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-        using var client = _clientFactory.CreateClient();
-        var response = await _policy.ExecuteAsync(async () => await client.SendAsync(request));
+        var response = await client.SendAsync(request);
         return response;
     }
 
