@@ -2,7 +2,7 @@ namespace PokeCards.Services;
 
 public static class Extensions
 {
-    public static IEnumerable<T> GetSafeRange<T>(this List<T>? list, int index, int count)
+    public static IEnumerable<T> GetRangeOrLess<T>(this List<T>? list, int index, int count)
     {
         if ((list?.Count ?? 0) == 0)
             return Enumerable.Empty<T>();

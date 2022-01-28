@@ -1,11 +1,6 @@
 using System.Diagnostics;
-using System.Net;
 using PokeCards.Contracts.Responses;
 using PokeCards.Data;
-using Polly;
-using Polly.CircuitBreaker;
-using Polly.Contrib.WaitAndRetry;
-using Polly.Wrap;
 
 namespace PokeCards.Services;
 
@@ -15,7 +10,7 @@ public class PokemontcgService
     private readonly IHttpClientFactory _clientFactory;
     private List<Card> _cards = new();
     private Object _padLock = new();
-    private const int _pageSize = 16;
+    private const int _pageSize = 35;
 
     public PokemontcgService(IHttpClientFactory clientFactory, PokeapiService pokeapiService)
     {
@@ -28,10 +23,11 @@ public class PokemontcgService
         var sw = new Stopwatch();
         sw.Start();
         _cards = new List<Card>();
+        List<HttpResponseMessage?> responses;
         using var client = _clientFactory.CreateClient("Pokemontcg");
 
         var running = true;
-        var totalCount = 80;
+        var totalCount = 140;
         var startPage = 1;
 
         while (_cards.Count < totalCount && running)
@@ -40,7 +36,7 @@ public class PokemontcgService
             if (totalCount % _pageSize != 0)
                 pages++;
             
-            var responses = await SendRequestsParallelAsync(client, speciesId, pages, startPage);
+            responses = await SendRequestsParallelAsync(client, speciesId, pages, startPage);
             foreach (var response in responses)
             {
                 if (!response!.IsSuccessStatusCode)

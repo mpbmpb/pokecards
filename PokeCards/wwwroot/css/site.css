@@ -82,4 +82,15 @@ a, .btn-link {
     content: "An error has occurred."
 }
 
+.wait-spinner {
+    width: 120px;
+    margin: 10% Calc(50% - 60px);
+    filter: brightness(0) saturate(100%) invert(93%) sepia(58%) saturate(3789%) hue-rotate(145deg) brightness(97%) contrast(102%)
+    drop-shadow( 0 0 1px #52fafa) drop-shadow( 0 0 2px #52fafa) drop-shadow( 0 0 4px rgba(82, 250, 250, 0.84))
+    drop-shadow(0 0 8px rgba(82, 250, 250, 0.65)) drop-shadow(0 0 12px rgba(82, 250, 250, 0.48));
+
+    /* ( filter is based on below color generated on https://codepen.io/sosuke/pen/Pjoqqp ) */
+    /*color: rgba(82, 250, 250, 0.74);*/
+}
+
     

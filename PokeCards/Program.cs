@@ -22,8 +22,9 @@ builder.Services
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("Pokemontcg").AddPolicyHandler(Policies.PokemontcgPolicy);
 builder.Services.AddHttpClient("Pokeapi").AddPolicyHandler(Policies.PokeapiPolicy);
+builder.Services.AddHttpClient("ImageService").AddPolicyHandler(Policies.ImageServicePolicy);
 builder.Services.AddSingleton<PokeapiService>();
-builder.Services.AddSingleton<ImageFetchingService>();
+builder.Services.AddSingleton<ImageService>();
 builder.Services.AddScoped<PokemontcgService>();
 builder.Services.AddSingleton<WeatherForecastService>();
 

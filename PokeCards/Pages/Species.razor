@@ -5,6 +5,7 @@
 @using System.Diagnostics
 @inject PokeapiService _pokeapiService
 @inject PokemontcgService _pokemontcgService;
+@inject ImageService ImageService;
 
 <PageTitle>Generations</PageTitle>
 
@@ -21,12 +22,17 @@
 <h4>Cards:</h4>
 
 <div class="card-grid-container">
+    @if (Cards.Count == 0)
+    {
+        <img src="data:image/svg+xml;base64,PCEtLSBCeSBTYW0gSGVyYmVydCAoQHNoZXJiKSwgZm9yIGV2ZXJ5b25lLiBNb3JlIEAgaHR0cDovL2dvby5nbC83QUp6YkwgLS0+Cjxzdmcgd2lkdGg9IjM4IiBoZWlnaHQ9IjM4IiB2aWV3Qm94PSIwIDAgMzggMzgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgc3Ryb2tlPSIjZmZmIj4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMSAxKSIgc3Ryb2tlLXdpZHRoPSIyIj4KICAgICAgICAgICAgPGNpcmNsZSBzdHJva2Utb3BhY2l0eT0iLjUiIGN4PSIxOCIgY3k9IjE4IiByPSIxOCIvPgogICAgICAgICAgICA8cGF0aCBkPSJNMzYgMThjMC05Ljk0LTguMDYtMTgtMTgtMTgiPgogICAgICAgICAgICAgICAgPGFuaW1hdGVUcmFuc2Zvcm0KICAgICAgICAgICAgICAgICAgICBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iCiAgICAgICAgICAgICAgICAgICAgdHlwZT0icm90YXRlIgogICAgICAgICAgICAgICAgICAgIGZyb209IjAgMTggMTgiCiAgICAgICAgICAgICAgICAgICAgdG89IjM2MCAxOCAxOCIKICAgICAgICAgICAgICAgICAgICBkdXI9IjFzIgogICAgICAgICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CiAgICAgICAgICAgIDwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=="
+             alt="loading" class="wait-spinner"/>
+    }
     <div class="card-list">
-        @foreach (var card in Cards)
+        @for (var i = 0; i < Cards.Count; i++)
         {
             <div class="card">
-                <img src="@card.ImageUrl" alt=""/>
-                <p>@card.Name</p>
+                <img src="@Cards[i].ImageBase64String" alt=""/>
+                <p>@Cards[i].Name</p>
             </div>
         }
     </div>
@@ -38,6 +44,7 @@
 @code {
     private Pokemon Pokemon = new();
     private List<Card> Cards = new();
+    private List<HttpContent> responses = new();
     private Stopwatch firstSw = new();
     private Stopwatch sw = new ();
     
@@ -48,7 +55,9 @@
     {
         firstSw.Start();
         Pokemon = await _pokeapiService.GetPokemonAsync(Id);
-        Cards = await _pokemontcgService.GetAllCardsForAsync(Id); //TODO implement caching with resilience
+        var cards = await _pokemontcgService.GetAllCardsForAsync(Id); //TODO implement caching
+        await ImageService.GetImagesAsync(cards);
+        Cards = cards;
         sw.Start();
     }
 
