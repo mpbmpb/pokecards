@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace PokeCards.Contracts.Responses;
 

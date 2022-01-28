@@ -6,7 +6,7 @@ public static class Extensions
     {
         if ((list?.Count ?? 0) == 0)
             return Enumerable.Empty<T>();
-        var listCount = list.Count;
+        var listCount = list?.Count ?? 0;
 
         if (listCount < index)
             return Enumerable.Empty<T>();
@@ -14,6 +14,6 @@ public static class Extensions
         if (index + count > listCount)
             count = listCount - index;
         
-        return list.GetRange(index, count);
+        return list?.GetRange(index, count) ?? new List<T>();
     }
 }

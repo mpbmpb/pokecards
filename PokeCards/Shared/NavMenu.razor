@@ -59,12 +59,6 @@
 
 @code
 {
-    private int _selectedGeneration = 1;
-    private string _link = "";
-    private List<Pokemon> _pokemonList = new ();
-    private IEnumerable<Pokemon> _pokemons = ArraySegment<Pokemon>.Empty;
-    
-
     private void RadioSelect(ChangeEventArgs args)
     {
         NavigationManager.NavigateTo(args.Value?.ToString() ?? "/");

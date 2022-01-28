@@ -1,10 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace PokeCards.Contracts.Responses;
 
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class PokemontcgResponse
 {
-    [JsonPropertyName("data")] public PokemontcgCardResponse[] Data { get; set; }
+    [JsonPropertyName("data")] public PokemontcgCardResponse[]? Data { get; set; }
     [JsonPropertyName("page")] public int? Page { get; set; }
     [JsonPropertyName("pageSize")] public int? PageSize { get; set; }
     [JsonPropertyName("count")] public int? Count { get; set; }

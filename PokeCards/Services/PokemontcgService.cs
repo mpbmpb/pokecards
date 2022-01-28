@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.Extensions.Caching.Memory;
 using PokeCards.Contracts.Responses;
 using PokeCards.Data;
 
@@ -6,24 +7,36 @@ namespace PokeCards.Services;
 
 public class PokemontcgService
 {
-    private PokeapiService _pokeapiService;
+    private readonly PokeapiService _pokeapiService;
     private readonly IHttpClientFactory _clientFactory;
+    private readonly MemoryCache _cache;
     private List<Card> _cards = new();
-    private Object _padLock = new();
+    private readonly object _padLock = new();
     private const int _pageSize = 35;
 
     public PokemontcgService(IHttpClientFactory clientFactory, PokeapiService pokeapiService)
     {
         _clientFactory = clientFactory;
         _pokeapiService = pokeapiService;
+        _cache = new MemoryCache(new MemoryCacheOptions
+        {
+            SizeLimit = 100
+        });
     }
 
     public async Task<List<Card>> GetAllCardsForAsync(int speciesId)
     {
         var sw = new Stopwatch();
         sw.Start();
+
+        if (_cache.TryGetValue(speciesId, out List<Card> cards))
+        {
+            sw.Stop();
+            Console.WriteLine($"Total time to get cards: {sw.ElapsedMilliseconds} ms");
+            return cards;
+        }
+        
         _cards = new List<Card>();
-        List<HttpResponseMessage?> responses;
         using var client = _clientFactory.CreateClient("Pokemontcg");
 
         var running = true;
@@ -36,7 +49,7 @@ public class PokemontcgService
             if (totalCount % _pageSize != 0)
                 pages++;
             
-            responses = await SendRequestsParallelAsync(client, speciesId, pages, startPage);
+            var responses = await SendRequestsParallelAsync(client, speciesId, pages, startPage);
             foreach (var response in responses)
             {
                 if (!response!.IsSuccessStatusCode)
@@ -50,6 +63,8 @@ public class PokemontcgService
 
             startPage += pages;
         }
+
+        _cache.Set(speciesId, _cards, new MemoryCacheEntryOptions().SetSize(1));
         
         sw.Stop();
         Console.WriteLine($"Total time to get cards: {sw.ElapsedMilliseconds} ms");
@@ -125,7 +140,7 @@ public class PokemontcgService
                 Supertype = cardResponse.Supertype ?? "",
                 Types = cardResponse.Types ?? Array.Empty<string>(),
                 Pokemons = cardResponse.PokedexNumbers?.Select(id => 
-                        pokemons.FirstOrDefault(p => p.Id == id) ?? new(0) )
+                        pokemons.FirstOrDefault(p => p.Id == id) ?? new() )
                     .Where(p => p.Id != 0).ToList() ?? new(),
                 ImageUrl = cardResponse.Images?.small ?? cardResponse.Images?.large ?? ""
             });

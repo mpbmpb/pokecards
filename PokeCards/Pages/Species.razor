@@ -28,11 +28,11 @@
              alt="loading" class="wait-spinner"/>
     }
     <div class="card-list">
-        @for (var i = 0; i < Cards.Count; i++)
+        @foreach (var card in Cards)
         {
             <div class="card">
-                <img src="@Cards[i].ImageBase64String" alt=""/>
-                <p>@Cards[i].Name</p>
+                <img src="@card.ImageBase64String" alt=""/>
+                <p>@card.Name</p>
             </div>
         }
     </div>
@@ -44,12 +44,11 @@
 @code {
     private Pokemon Pokemon = new();
     private List<Card> Cards = new();
-    private List<HttpContent> responses = new();
     private Stopwatch firstSw = new();
     private Stopwatch sw = new ();
     
     [Parameter]
-    public int Id { get; set; } = 0;
+    public int Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

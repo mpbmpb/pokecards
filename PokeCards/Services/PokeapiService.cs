@@ -16,7 +16,7 @@ public class PokeapiService
         _clientFactory = clientFactory;
     }
 
-    private int[][] _generations = new int[][] { new[] { 0 }, // generation 0 does not have a populationCount
+    private readonly int[][] _generations = new int[][] { new[] { 0 }, // generation 0 does not have a populationCount
         new[] {0, 151 }, new []{151, 100}, new []{251, 135}, // { where the generation starts, how many pokemon in the generation }
         new []{386, 107}, new []{493, 156}, new []{649, 72}, 
         new []{721, 88}, new []{809, 89}, new []{897, 10_000} };  // last gen 9 is called 8+ meaning everything after gen 8
@@ -84,8 +84,7 @@ public class PokeapiService
 
     private static int GetIdFromUrl(string url)
     {
-        int id = 0;
-        int.TryParse(PokemonIdFromUrl.Match(url).Groups["id"].Value, out id);
+        int.TryParse(PokemonIdFromUrl.Match(url).Groups["id"].Value, out var id);
         return id;
     }
 }

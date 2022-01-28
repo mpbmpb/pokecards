@@ -1,7 +1,7 @@
 @page "/"
 @using PokeCards.Services
 @using PokeCards.Data
-@inject PokeapiService _pokeapiService 
+@inject PokeapiService PokeapiService 
 
 <PageTitle>PokeCards</PageTitle>
 
@@ -11,7 +11,7 @@
     <ul>
         @foreach (var pokemonType in _pokemonTypes)
         {
-            <li>@pokemonType.Name <img src="@pokemonType.IconUrl" class="img img-pokemon"></li>  
+            <li>@pokemonType.Name <img src="@pokemonType.IconUrl" class="img img-pokemon" alt="@pokemonType.Name"></li>  
         }
     </ul>
 </div>
@@ -23,5 +23,6 @@
     protected override async Task OnInitializedAsync()
     {
         _pokemonTypes = PokemonTypes.GetAll();
+        await PokeapiService.GetAllPokemonAsync();
     }
 }

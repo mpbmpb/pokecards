@@ -2,7 +2,7 @@
 
 <div class="pokemon-grid-container"> 
     <div class="pokemon-list">
-        @foreach (var pokemon in Pokemons)
+        @foreach (var pokemon in Pokemons ?? new List<Pokemon>())
         {
             <SpeciesCard Pokemon="pokemon"></SpeciesCard>
         }
@@ -11,6 +11,6 @@
 
 @code {
     [Parameter]
-    public IEnumerable<Pokemon> Pokemons { get; set; }
+    public IEnumerable<Pokemon>? Pokemons { get; set; }
     
 }

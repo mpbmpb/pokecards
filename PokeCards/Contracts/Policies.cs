@@ -64,15 +64,14 @@ public static class Policies
             
                 var emptyMessage = new HttpResponseMessage() { Content = new StringContent("") };
                 return Task.FromResult(emptyMessage);
-            };
-            
+            }
+
             Task onFallbackAsync(DelegateResult<HttpResponseMessage> response, Context context)
             {
                 // Console.WriteLine("Image fallback executed");
                 return Task.CompletedTask;
-            };
-            var notFoundFallback = Policy.HandleResult<HttpResponseMessage>(r 
-                => r.StatusCode == HttpStatusCode.NotFound).FallbackAsync(fallbackAction, onFallbackAsync);
+            }
+
             var fallBackPolicy = Policy.HandleResult<HttpResponseMessage>(r
                 => !r.IsSuccessStatusCode).Or<Exception>()
                 .FallbackAsync( fallbackAction, onFallbackAsync);
@@ -82,9 +81,6 @@ public static class Policies
                 => r.StatusCode is not HttpStatusCode.NotFound and > HttpStatusCode.BadRequest)
                 .Or<Exception>()
                 .WaitAndRetryAsync(delay);
-            var circuitBreaker = Policy.HandleResult<HttpResponseMessage>(r =>
-                    !r.IsSuccessStatusCode).Or<Exception>()
-                .AdvancedCircuitBreakerAsync(0.7, TimeSpan.FromSeconds(10), 50, TimeSpan.FromSeconds(20));
 
             var policy = fallBackPolicy.WrapAsync(retryPolicy).WrapAsync(timeoutPolicy);
             return policy;
