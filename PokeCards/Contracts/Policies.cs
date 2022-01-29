@@ -68,15 +68,14 @@ public static class Policies
 
             Task onFallbackAsync(DelegateResult<HttpResponseMessage> response, Context context)
             {
-                // Console.WriteLine("Image fallback executed");
                 return Task.CompletedTask;
             }
 
             var fallBackPolicy = Policy.HandleResult<HttpResponseMessage>(r
                 => !r.IsSuccessStatusCode).Or<Exception>()
                 .FallbackAsync( fallbackAction, onFallbackAsync);
-            var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(100), 2);
-            var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(500));
+            var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(100), 3);
+            var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(700));
             var retryPolicy = Policy.HandleResult<HttpResponseMessage>(r 
                 => r.StatusCode is not HttpStatusCode.NotFound and > HttpStatusCode.BadRequest)
                 .Or<Exception>()

@@ -55,12 +55,12 @@ public class PokeapiTests : UnitTestBase
     [InlineData(1, 0, 151)]
     [InlineData(3, 251, 135)]
     [InlineData(7, 721, 88)]
-    public async Task GenerationRange_gives_correct_offset_and_count_for_given_generation(int gen, int offset, int count)
+    public void GenerationRange_gives_correct_offset_and_count_for_given_generation(int gen, int offset, int count)
     {
-        var result = _sut.GenerationRange(gen);
+        var (genOffset, populationCount) = _sut.GenerationRange(gen);
 
-        result.offset.Should().Be(offset);
-        result.populationCount.Should().Be(count);
+        genOffset.Should().Be(offset);
+        populationCount.Should().Be(count);
     }
 
     [Theory]

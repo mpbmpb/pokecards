@@ -54,7 +54,7 @@
     {
         firstSw.Start();
         Pokemon = await _pokeapiService.GetPokemonAsync(Id);
-        var cards = await _pokemontcgService.GetAllCardsForAsync(Id); //TODO implement caching
+        var cards = await _pokemontcgService.GetAllCardsForAsync(Id);
         await ImageService.GetImagesAsync(cards);
         Cards = cards;
         sw.Start();
