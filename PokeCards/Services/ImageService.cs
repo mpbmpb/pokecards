@@ -9,6 +9,7 @@ public class ImageService
 {
     private readonly IHttpClientFactory _clientFactory;
     private readonly MemoryCache _cache;
+    private readonly string _notfoundImage;
     private static readonly Regex ExtensionFromUrl = new Regex(@"\.(?<ext>\w{3})$", 
         RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
 
@@ -19,6 +20,8 @@ public class ImageService
         {
             SizeLimit = 1024
         });
+        var imageBytes = File.ReadAllBytes("wwwroot/Images/Logos/notfound.png");
+        _notfoundImage= $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
     }
 
     public async Task GetImagesAsync(List<Card> cards)
@@ -67,37 +70,61 @@ public class ImageService
         return "";
     }
 
-   public async Task<string> GetPngImageAsync(string url)
+    public async Task<string> GetPngImageAsync(string url)
     {
         var client = _clientFactory.CreateClient("ImageService");
         if (!_cache.TryGetValue(url, out string imageBase64String))
         {
-            var imageBytes = await client.GetByteArrayAsync(url);
-            imageBase64String = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
-            _cache.Set(url, imageBase64String, new MemoryCacheEntryOptions().SetSize(1));
+            try
+            {
+                var imageBytes = await client.GetByteArrayAsync(url);
+                imageBase64String = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
+                _cache.Set(url, imageBase64String,
+                    new MemoryCacheEntryOptions().SetSize(1));
+            }
+            catch (Exception)
+            {
+                imageBase64String = _notfoundImage;
+            }
         }
         return imageBase64String;
     }
 
-   private async Task<string> GetPngImageAsync(string url, HttpClient client)
+    private async Task<string> GetPngImageAsync(string url, HttpClient client)
     {
         if (!_cache.TryGetValue(url, out string imageBase64String))
         {
-            var imageBytes = await client.GetByteArrayAsync(url);
-            imageBase64String = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
-            _cache.Set(url, imageBase64String, new MemoryCacheEntryOptions().SetSize(1));
+            try
+            {
+                var imageBytes = await client.GetByteArrayAsync(url);
+                imageBase64String = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
+                _cache.Set(url, imageBase64String,
+                    new MemoryCacheEntryOptions().SetSize(1));
+            }
+            catch (Exception)
+            {
+                imageBase64String = _notfoundImage;
+            }
         }
         return imageBase64String;
     }
-   
+
     public async Task<string> GetJpgImageAsync(string url)
     {
         var client = _clientFactory.CreateClient("ImageService");
         if (!_cache.TryGetValue(url, out string imageBase64String))
         {
-            var imageBytes = await client.GetByteArrayAsync(url);
-            imageBase64String = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
-            _cache.Set(url, imageBase64String, new MemoryCacheEntryOptions().SetSize(1));
+            try
+            {
+                var imageBytes = await client.GetByteArrayAsync(url);
+                imageBase64String = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
+                _cache.Set(url, imageBase64String,
+                    new MemoryCacheEntryOptions().SetSize(1));
+            }
+            catch (Exception)
+            {
+                imageBase64String = _notfoundImage;
+            }
         }
         return imageBase64String;
     }
@@ -106,9 +133,17 @@ public class ImageService
     {
         if (!_cache.TryGetValue(url, out string imageBase64String))
         {
-            var imageBytes = await client.GetByteArrayAsync(url);
-            imageBase64String = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
-            _cache.Set(url, imageBase64String, new MemoryCacheEntryOptions().SetSize(1));
+            try
+            {
+                var imageBytes = await client.GetByteArrayAsync(url);
+                imageBase64String = $"data:image/jpg;base64,{Convert.ToBase64String(imageBytes)}";
+                _cache.Set(url, imageBase64String,
+                    new MemoryCacheEntryOptions().SetSize(1));
+            }
+            catch (Exception)
+            {
+                imageBase64String = _notfoundImage;
+            }
         }
         return imageBase64String;
     }
