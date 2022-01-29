@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeCards", "PokeCards\PokeCards.csproj", "{1D9E6B75-02CE-4A11-893C-158F121ED8F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeCards.Tests", "PokeCards.Tests\PokeCards.Tests.csproj", "{8228FD47-7DEE-4590-8329-7F1CDF818256}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{1D9E6B75-02CE-4A11-893C-158F121ED8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D9E6B75-02CE-4A11-893C-158F121ED8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D9E6B75-02CE-4A11-893C-158F121ED8F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8228FD47-7DEE-4590-8329-7F1CDF818256}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8228FD47-7DEE-4590-8329-7F1CDF818256}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8228FD47-7DEE-4590-8329-7F1CDF818256}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8228FD47-7DEE-4590-8329-7F1CDF818256}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

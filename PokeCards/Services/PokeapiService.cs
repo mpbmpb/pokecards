@@ -6,7 +6,7 @@ namespace PokeCards.Services;
 
 public class PokeapiService
 {
-    private const string _speciesUrl = "https://pokeapi.co/api/v2/pokemon-species?limit=100000";
+    private const string _speciesUrl = "https://pokeapi.co/api/v2/pokemon-species?limit=10000";
     private readonly IHttpClientFactory _clientFactory;
     private static readonly Regex PokemonIdFromUrl = new Regex(@"\/(?<id>\d+)\/", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
     private List<Pokemon> _pokemons = new();
@@ -21,8 +21,8 @@ public class PokeapiService
         new []{386, 107}, new []{493, 156}, new []{649, 72}, 
         new []{721, 88}, new []{809, 89}, new []{897, 10_000} };  // last gen 9 is called 8+ meaning everything after gen 8
 
-    public (int generation,int offset, int populationCount) GenerationRange(int gen) => gen > 0 && gen < _generations.Length ?
-        (gen, _generations[gen][0], _generations[gen][1]) : (1, 0, 151);
+    public (int offset, int populationCount) GenerationRange(int gen) => gen > 0 && gen < _generations.Length ?
+        ( _generations[gen][0], _generations[gen][1]) : (0, 151);
 
     public async Task<List<Pokemon>> GetAllPokemonAsync()
     {
