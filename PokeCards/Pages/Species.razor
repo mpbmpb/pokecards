@@ -38,7 +38,6 @@
             @foreach (var card in Cards)
             {
                 <div class="card">
-                    @* <img src="@($"data:image/png;base64,{Convert.ToBase64String(card.ImageBytes)}")" alt=""/> *@
                     <img src="@SetImageUsingBytes(card.ImageBytes, card.Id)" id="@card.Id" alt=""/>
                     <p>@card.Name</p>
                 </div>

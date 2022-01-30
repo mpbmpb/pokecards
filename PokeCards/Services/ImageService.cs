@@ -18,7 +18,7 @@ public class ImageService
         _clientFactory = clientFactory;
         _cache = new MemoryCache(new MemoryCacheOptions
         {
-            SizeLimit = 1024
+            SizeLimit = 400
         });
         _notfoundImage = File.ReadAllBytes("wwwroot/Images/Logos/notfound.png");
     }
