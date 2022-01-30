@@ -55,7 +55,7 @@ public static class Policies
         get
         {
             var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(100), 3);
-            var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(600));
+            var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(800));
             var retryPolicy = Policy.HandleResult<HttpResponseMessage>(r 
                 => !r.IsSuccessStatusCode && r.StatusCode is not HttpStatusCode.NotFound)
                 .Or<Exception>()
@@ -63,7 +63,7 @@ public static class Policies
             var circuitBreaker = Policy.HandleResult<HttpResponseMessage>(r
                 => !r.IsSuccessStatusCode && r.StatusCode is not HttpStatusCode.NotFound)
                 .Or<Exception>()
-                .AdvancedCircuitBreakerAsync(0.5, TimeSpan.FromSeconds(4), 8, TimeSpan.FromSeconds(20));
+                .AdvancedCircuitBreakerAsync(0.5, TimeSpan.FromSeconds(4), 8, TimeSpan.FromSeconds(15));
 
             var policy = retryPolicy.WrapAsync(timeoutPolicy).WrapAsync(circuitBreaker);
             return policy;
