@@ -33,6 +33,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        GC.Collect();
         _pokemonList = await _pokeapiService.GetAllPokemonAsync();
         var generation = _pokeapiService.GenerationRange(_selectedGeneration);
         _pokemons = _pokemonList.GetRangeOrLess(generation.offset, generation.populationCount);

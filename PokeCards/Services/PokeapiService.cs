@@ -6,7 +6,8 @@ namespace PokeCards.Services;
 
 public class PokeapiService
 {
-    private const string _speciesUrl = "https://pokeapi.co/api/v2/pokemon-species?limit=10000";
+    private const string _allSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species?limit=10000";
+    private const string _speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/";
     private readonly IHttpClientFactory _clientFactory;
     private static readonly Regex PokemonIdFromUrl = new Regex(@"\/(?<id>\d+)\/", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
     private List<Pokemon> _pokemons = new();
@@ -48,9 +49,9 @@ public class PokeapiService
 
     private async Task GetAllPokemonFromApiAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, _speciesUrl);
+        using var request = new HttpRequestMessage(HttpMethod.Get, _allSpeciesUrl);
         using var client = _clientFactory.CreateClient("Pokeapi");
-        var response = await client.SendAsync(request);
+        using var response = await client.SendAsync(request);
 
         _pokemons = await ExtractPokemonAsync(response);
     }
@@ -70,7 +71,6 @@ public class PokeapiService
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw;
             }
         }
 
@@ -87,4 +87,69 @@ public class PokeapiService
         int.TryParse(PokemonIdFromUrl.Match(url).Groups["id"].Value, out var id);
         return id;
     }
+
+    private async void GetEvolutionsFor(int id)
+    {
+        using var client = _clientFactory.CreateClient("Pokeapi");
+        using var request = new HttpRequestMessage(HttpMethod.Get, _allSpeciesUrl + id);
+        using var response = await client.SendAsync(request);
+        var detailResponse = new PokeapiSpeciesDetailResponse();
+
+        if (response.IsSuccessStatusCode)
+        {
+            try
+            {
+                detailResponse = await response.Content.ReadFromJsonAsync<PokeapiSpeciesDetailResponse>();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return;
+            }
+        }
+
+        var evolutionChainUrl = detailResponse?.EvolutionChain?.url ?? "";
+        if (evolutionChainUrl == "")
+            return;
+
+        using var evolutionChainRequest = new HttpRequestMessage(HttpMethod.Get, evolutionChainUrl);
+        using var pokeapiResponse = await client.SendAsync(evolutionChainRequest);
+        EvolutionChain? chain = null;
+
+        if (pokeapiResponse.IsSuccessStatusCode)
+        {
+            try
+            {
+               var evolutionChainResponse = await pokeapiResponse.Content.ReadFromJsonAsync<PokeapiEvolutionChainResponse>();
+               chain = evolutionChainResponse?.Chain;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return;
+            }
+        }
+
+        if (chain is null)
+            return;
+
+        var evolutionChain = OrderByEvolution(chain);
+
+    }
+
+    private async Task<List<List<Pokemon>>> OrderByEvolution(EvolutionChain chain)
+    {
+        var result = new List<List<Pokemon>>();
+
+        var currentPokemon = _pokemons.FirstOrDefault(p => p.Name == chain.Species.name) ?? new();
+        result.Add(new List<Pokemon> { currentPokemon } );
+        
+        // need to make recursive data structure instead of list<list>
+        
+       
+
+
+        return result;
+    }
+
 }

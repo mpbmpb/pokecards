@@ -20,7 +20,7 @@ public class PokemontcgService
         _pokeapiService = pokeapiService;
         _cache = new MemoryCache(new MemoryCacheOptions
         {
-            SizeLimit = 100
+            SizeLimit = 20
         });
     }
 
@@ -35,15 +35,16 @@ public class PokemontcgService
             Console.WriteLine($"Total time to get cards: {sw.ElapsedMilliseconds} ms");
             return cards;
         }
+
+        _cards = new();
         
-        _cards = new List<Card>();
         using var client = _clientFactory.CreateClient("Pokemontcg");
 
-        var running = true;
+        var success = true;
         var totalCount = 140;
         var startPage = 1;
 
-        while (_cards.Count < totalCount && running)
+        while (_cards.Count < totalCount && success)
         {
             var pages = (totalCount - _cards.Count) / _pageSize;
             if (totalCount % _pageSize != 0)
@@ -54,17 +55,19 @@ public class PokemontcgService
             {
                 if (!response!.IsSuccessStatusCode)
                 {
-                    running = false;
+                    success = false;
                     continue;
                 }
                 var responseCount =  await ExtractCards(response);
                 totalCount = responseCount;
+                response.Dispose();
             }
 
             startPage += pages;
         }
 
-        _cache.Set(speciesId, _cards, new MemoryCacheEntryOptions().SetSize(1));
+        if (success && _cards.Count > 0 && _cards.Count == totalCount)
+            _cache.Set(speciesId, _cards, new MemoryCacheEntryOptions().SetSize(1));
         
         sw.Stop();
         Console.WriteLine($"Total time to get cards: {sw.ElapsedMilliseconds} ms");

@@ -18,7 +18,7 @@ public class ImageService
         _clientFactory = clientFactory;
         _cache = new MemoryCache(new MemoryCacheOptions
         {
-            SizeLimit = 400
+            SizeLimit = 250
         });
         _notfoundImage = File.ReadAllBytes("wwwroot/Images/Logos/notfound.png");
     }
@@ -26,7 +26,7 @@ public class ImageService
     public async Task GetImagesAsync(List<Card> cards)
     {
         var sw = Stopwatch.StartNew();
-        var client = _clientFactory.CreateClient("ImageService");
+        using var client = _clientFactory.CreateClient("ImageService");
         var tasks = new List<Task>();
         foreach (var card in cards)
         {

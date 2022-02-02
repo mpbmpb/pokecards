@@ -60,6 +60,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        GC.Collect();
         firstSw.Start();
         Pokemon = await _pokeapiService.GetPokemonAsync(Id);
         var cards = await _pokemontcgService.GetAllCardsForAsync(Id);
@@ -82,8 +83,8 @@
 
     private async Task SetImageUsingBytes(byte[] bytes, string id)
     {
-        var stream = new MemoryStream(bytes);
-        var dotnetImageStream = new DotNetStreamReference(stream);
+        await using var stream = new MemoryStream(bytes);
+        using var dotnetImageStream = new DotNetStreamReference(stream);
         await JS.InvokeVoidAsync("setImageUsingStreaming", id, dotnetImageStream);
     }
 }
