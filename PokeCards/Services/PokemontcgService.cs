@@ -36,7 +36,7 @@ public class PokemontcgService
             return cards;
         }
 
-        _cards = new();
+        _cards.Clear();
         
         using var client = _clientFactory.CreateClient("Pokemontcg");
 
