@@ -26,7 +26,6 @@ builder.Services.AddHttpClient("ImageService").AddPolicyHandler(Policies.ImageSe
 builder.Services.AddSingleton<PokeapiService>();
 builder.Services.AddSingleton<ImageService>();
 builder.Services.AddSingleton<PokemontcgService>();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 

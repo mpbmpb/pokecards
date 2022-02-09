@@ -130,26 +130,31 @@ public class PokeapiService
             }
         }
 
-        if (chain is null)
-            return;
+        chain = FindPreviousEvolution(chain, id);
 
-        var evolutionChain = OrderByEvolution(chain);
 
     }
 
-    private async Task<List<List<Pokemon>>> OrderByEvolution(EvolutionChain chain)
+
+    private EvolutionChain? FindPreviousEvolution(EvolutionChain? chain, int id)
     {
-        var result = new List<List<Pokemon>>();
-
-        var currentPokemon = _pokemons.FirstOrDefault(p => p.Name == chain.Species.name) ?? new();
-        result.Add(new List<Pokemon> { currentPokemon } );
+        if (GetIdFromUrl(chain?.Species.url ?? "-1") == id)
+            return chain;
         
-        // need to make recursive data structure instead of list<list>
-        
-       
+        while (chain?.EvolvesTo?.Count > 0)
+        {
+            if (chain.EvolvesTo.Any(x => GetIdFromUrl(x.Species.url) == id))
+                return chain;
 
+            foreach (var evolutionChain in chain.EvolvesTo)
+            {
+                var match = FindPreviousEvolution(evolutionChain, id);
+                if (match is not null)
+                    return match;
+            }
+        }
 
-        return result;
+        return null;
     }
 
 }
