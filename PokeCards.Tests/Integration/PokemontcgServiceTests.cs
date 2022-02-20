@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using PokeCards.Services;
 using PokeCards.Tests.InfraStructure;
 
-namespace PokeCards.Tests.UnitTests;
+namespace PokeCards.Tests.Integration;
 
-public class PokemontcgServiceTests : UnitTestBase
+public class PokemontcgServiceTests : IntegrationTestBase
 {
     private readonly PokemontcgService _sut;
 

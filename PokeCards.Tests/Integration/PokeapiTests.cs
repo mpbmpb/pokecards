@@ -2,11 +2,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using PokeCards.Services;
 using PokeCards.Tests.InfraStructure;
+
 // ReSharper disable StringLiteralTypo
 
-namespace PokeCards.Tests.UnitTests;
+namespace PokeCards.Tests.Integration;
 
-public class PokeapiTests : UnitTestBase
+public class PokeapiTests : IntegrationTestBase
 {
     private readonly PokeapiService _sut;
 

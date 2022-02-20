@@ -20,7 +20,7 @@ public class PokemontcgService
         _pokeapiService = pokeapiService;
         _cache = new MemoryCache(new MemoryCacheOptions
         {
-            SizeLimit = 20
+            SizeLimit = 2
         });
     }
 
@@ -67,8 +67,11 @@ public class PokemontcgService
         }
 
         if (success && _cards.Count > 0 && _cards.Count == totalCount)
+        {
             _cache.Set(speciesId, _cards, new MemoryCacheEntryOptions().SetSize(1));
-        
+            _cache.Set(speciesId, _cards, new MemoryCacheEntryOptions().SetSize(1));
+        }
+
         sw.Stop();
         Console.WriteLine($"Total time to get cards: {sw.ElapsedMilliseconds} ms");
         return _cards;

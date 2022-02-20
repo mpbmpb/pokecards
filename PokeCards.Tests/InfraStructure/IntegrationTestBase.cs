@@ -5,11 +5,11 @@ using PokeCards.Contracts;
 
 namespace PokeCards.Tests.InfraStructure;
 
-public class UnitTestBase
+public class IntegrationTestBase
 {
     protected readonly IHttpClientFactory ClientFactory;
 
-    public UnitTestBase()
+    public IntegrationTestBase()
     {
         var services = new ServiceCollection();
         services.AddHttpClient();

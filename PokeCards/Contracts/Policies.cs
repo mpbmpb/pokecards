@@ -55,7 +55,7 @@ public static class Policies
         get
         {
             var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(100), 5);
-            var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(600));
+            var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromMilliseconds(1800));
             var retryPolicy = Policy.HandleResult<HttpResponseMessage>(r 
                 => !r.IsSuccessStatusCode && r.StatusCode is not HttpStatusCode.NotFound)
                 .Or<Exception>()
