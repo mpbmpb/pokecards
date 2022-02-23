@@ -6,13 +6,13 @@ using PokeCards.Tests.InfraStructure;
 
 namespace PokeCards.Tests.Integration;
 
-public class PokeapiTests : IntegrationTestBase
+public class PokeapiTests : IClassFixture<ServicesIntegrationTestBase>
 {
     private readonly PokeapiService _sut;
 
-    public PokeapiTests()
+    public PokeapiTests(ServicesIntegrationTestBase testBase)
     {
-        _sut = new PokeapiService(ClientFactory);
+        _sut = testBase.PokeapiService;
     }
     
     [Fact]

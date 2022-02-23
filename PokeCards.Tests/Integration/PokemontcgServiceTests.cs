@@ -4,14 +4,14 @@ using PokeCards.Tests.InfraStructure;
 
 namespace PokeCards.Tests.Integration;
 
-public class PokemontcgServiceTests : IntegrationTestBase
+[Collection("PokemontcgService Integration tests")]
+public class PokemontcgServiceTests : IClassFixture<ServicesIntegrationTestBase>
 {
     private readonly PokemontcgService _sut;
 
-    public PokemontcgServiceTests()
+    public PokemontcgServiceTests(ServicesIntegrationTestBase testBase)
     {
-        var pokeapiService = new PokeapiService(ClientFactory);
-        _sut = new(ClientFactory, pokeapiService);
+        _sut = testBase.PokemontcgService;
     }
 
     [Theory]

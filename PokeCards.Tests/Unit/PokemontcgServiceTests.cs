@@ -12,29 +12,33 @@ using Xunit.Abstractions;
 
 namespace PokeCards.Tests.Unit;
 
-public class PokemontcgServiceTests
+[Collection("PokemontcgService Unit tests")]
+public class PokemontcgServiceTests : IDisposable
 {
     
     [Fact]
     public async Task MockClientFactory_ShouldProduce_GivenResponse()
     {
         var guid = Guid.NewGuid();
-        var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
+        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
         var factory = MockHttpHelper.GetFactory(guid.ToString());
-        var client = factory.CreateClient();
+        using var client = factory.CreateClient();
 
-        var response = await client.SendAsync(request);
+        using var response = await client.SendAsync(request);
         var result = await response.Content.ReadAsStringAsync();
 
         result.Should().Match(guid.ToString());
     }
 
-    [Fact]
-    public async Task GetCardsForAsync_ShouldReturn_AllSeededCards()
+    [Theory]
+    [InlineData(3)]
+    [InlineData(8)]
+    [InlineData(42)]
+    [InlineData(90)]
+    public async Task GetCardsForAsync_ShouldReturn_SameNumberOfSeededCards(int numberOfCards)
     {
-        // var pokemons = new List<Pokemon> { new(1, "testPokemon")};
-        var responses = DataHelper.GetPokemontcgResponsesJson(3, 35, 4);
-        var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
+        var responses = DataHelper.GetPokemontcgResponsesJson(numberOfCards, 35, 4);
+        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
         var factory = MockHttpHelper.GetFactory(responses);
 
         var pokeapiService = Substitute.For<IPokeapiService>();
@@ -43,7 +47,11 @@ public class PokemontcgServiceTests
 
         var cards = await sut.GetAllCardsForAsync(1);
         
-        cards.Count.Should().Be(3);
+        cards.Count.Should().Be(numberOfCards);
     }
 
+    public void Dispose()
+    {
+        GC.Collect();
+    }
 }
