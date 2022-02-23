@@ -4,7 +4,7 @@ using PokeCards.Data;
 
 namespace PokeCards.Services;
 
-public class PokeapiService
+public class PokeapiService : IPokeapiService
 {
     private const string _allSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species?limit=10000";
     private const string _speciesUrl = "https://pokeapi.co/api/v2/pokemon-species/";

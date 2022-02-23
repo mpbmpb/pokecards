@@ -73,7 +73,7 @@ public static class DataHelper
     
     public static string GetEmptyPokemontcgResponseJson(int numberOfCards, int pageSize, int page)
     {
-        var response = GetPokemontcgResponseFaker(0, pageSize, page, numberOfCards).Generate();
+        var response = GetPokemontcgResponseFaker(1,0, pageSize, page, numberOfCards).Generate();
 
         return JsonSerializer.Serialize(response);
     }

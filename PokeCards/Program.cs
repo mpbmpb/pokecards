@@ -23,7 +23,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("Pokemontcg").AddPolicyHandler(Policies.PokemontcgPolicy);
 builder.Services.AddHttpClient("Pokeapi").AddPolicyHandler(Policies.PokeapiPolicy);
 builder.Services.AddHttpClient("ImageService").AddPolicyHandler(Policies.ImageServicePolicy);
-builder.Services.AddSingleton<PokeapiService>();
+builder.Services.AddSingleton<IPokeapiService, PokeapiService>();
 builder.Services.AddSingleton<ImageService>();
 builder.Services.AddSingleton<PokemontcgService>();
 

@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Bogus;
@@ -31,15 +32,18 @@ public class PokemontcgServiceTests
     [Fact]
     public async Task GetCardsForAsync_ShouldReturn_AllSeededCards()
     {
+        // var pokemons = new List<Pokemon> { new(1, "testPokemon")};
         var responses = DataHelper.GetPokemontcgResponsesJson(3, 35, 4);
         var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
         var factory = MockHttpHelper.GetFactory(responses);
 
-        var pokeapiService = new PokeapiService(factory);
+        var pokeapiService = Substitute.For<IPokeapiService>();
+        pokeapiService.GetAllPokemonAsync().Returns(new List<Pokemon>());
         var sut = new PokemontcgService(factory, pokeapiService);
 
         var cards = await sut.GetAllCardsForAsync(1);
-
+        
+        cards.Count.Should().Be(3);
     }
 
 }
