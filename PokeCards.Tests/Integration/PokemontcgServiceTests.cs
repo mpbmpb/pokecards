@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using PokeCards.Services;
 using PokeCards.Tests.InfraStructure;

@@ -7,39 +7,36 @@ namespace PokeCards.Tests.Helpers;
 
 public class MockHttpMessageHandler : HttpMessageHandler
 {
-    private readonly string _response;
-    private readonly string _emptyResponse;
+    private readonly string[] _responses;
     private readonly HttpStatusCode _statusCode;
     private int _requestCount = 0;
 
     public MockHttpMessageHandler(string response, HttpStatusCode statusCode)
     {
-        _response = response;
-        _emptyResponse = "";
+        _responses = new []{ response };
         _statusCode = statusCode;
     }
     
-   public MockHttpMessageHandler(string response, string emptyResponse, HttpStatusCode statusCode)
+   public MockHttpMessageHandler(string[] responses, HttpStatusCode statusCode)
     {
-        _response = response;
-        _emptyResponse = emptyResponse;
+        _responses = responses;
         _statusCode = statusCode;
     }
     
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var response = _response;
-        if ( _requestCount > 0)
+        var index = _requestCount;
+        if ( _requestCount > _responses.Length)
         {
-            response = _emptyResponse;
+            index = _responses.Length - 1;
         }
 
         Interlocked.Increment(ref _requestCount);
         return new HttpResponseMessage
         {
             StatusCode = _statusCode,
-            Content = new StringContent(response)
+            Content = new StringContent(_responses[index])
         };
     }
 }
