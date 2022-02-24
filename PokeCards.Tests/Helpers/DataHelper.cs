@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Text.Json;
+using AutoMapper;
 using Bogus;
 using PokeCards.Contracts.Responses;
+using PokeCards.Data;
 
 namespace PokeCards.Tests.Helpers;
 
@@ -103,5 +106,12 @@ public static class DataHelper
 
         return fakers;
     }
-
+    
+    public static IEnumerable<Card> ExtractCards(string[] responses)
+    {
+        var pokemontcgResponse = JsonSerializer.Deserialize<PokemontcgResponse>(responses[0]);
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<PokemontcgCardResponse, Card>());
+        var mapper = config.CreateMapper();
+        return pokemontcgResponse.Data.Select(r => mapper.Map<Card>(r));
+    }
 }

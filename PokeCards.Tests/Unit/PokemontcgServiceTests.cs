@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using AutoMapper;
 using Bogus;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using PokeCards.Contracts.Responses;
@@ -15,7 +16,15 @@ namespace PokeCards.Tests.Unit;
 [Collection("PokemontcgService Unit tests")]
 public class PokemontcgServiceTests : IDisposable
 {
-    
+    private readonly IPokeapiService _pokeapiService;
+
+    public PokemontcgServiceTests()
+    {
+        var pokeapiService = Substitute.For<IPokeapiService>();
+        pokeapiService.GetAllPokemonAsync().Returns(new List<Pokemon>());
+        _pokeapiService = pokeapiService;
+    }
+
     [Fact]
     public async Task MockClientFactory_ShouldProduce_GivenResponse()
     {
@@ -38,17 +47,28 @@ public class PokemontcgServiceTests : IDisposable
     public async Task GetCardsForAsync_ShouldReturn_SameNumberOfSeededCards(int numberOfCards)
     {
         var responses = DataHelper.GetPokemontcgResponsesJson(numberOfCards, 35, 4);
-        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
         var factory = MockHttpHelper.GetFactory(responses);
-
-        var pokeapiService = Substitute.For<IPokeapiService>();
-        pokeapiService.GetAllPokemonAsync().Returns(new List<Pokemon>());
-        var sut = new PokemontcgService(factory, pokeapiService);
-
+        var sut = new PokemontcgService(factory, _pokeapiService);
+        
         var cards = await sut.GetAllCardsForAsync(1);
         
         cards.Count.Should().Be(numberOfCards);
     }
+
+    [Fact]
+    public async Task GetCardsForAsync_ShouldReturnCards_WithSimilarProperties()
+    {
+        var responses = DataHelper.GetPokemontcgResponsesJson(10, 35, 4);
+        var factory = MockHttpHelper.GetFactory(responses);
+        var sourceCards = DataHelper.ExtractCards(responses);
+        var sut = new PokemontcgService(factory, _pokeapiService);
+
+        var cards = await sut.GetAllCardsForAsync(1);
+
+        cards.Should().BeEquivalentTo(sourceCards);
+    }
+
+
 
     public void Dispose()
     {
