@@ -20,7 +20,7 @@ public class PokemontcgService
         _pokeapiService = pokeapiService;
         _cache = new MemoryCache(new MemoryCacheOptions
         {
-            SizeLimit = 2
+            SizeLimit = 30
         });
     }
 

@@ -13,10 +13,16 @@ using Xunit.Abstractions;
 
 namespace PokeCards.Tests.Unit;
 
-[Collection("PokemontcgService Unit tests")]
+//[Collection("PokemontcgService Unit tests")]
 public class PokemontcgServiceTests : IDisposable
 {
     private readonly IPokeapiService _pokeapiService;
+    private static IPokeapiService _getPokeapiServiceWithId(int pokedexNumber)
+    {
+        var pokeapiService = Substitute.For<IPokeapiService>();
+        pokeapiService.GetAllPokemonAsync().Returns(new List<Pokemon>{new Pokemon(pokedexNumber, "testPokemon")});
+        return pokeapiService;
+    }
 
     public PokemontcgServiceTests()
     {
@@ -46,9 +52,10 @@ public class PokemontcgServiceTests : IDisposable
     [InlineData(90)]
     public async Task GetCardsForAsync_ShouldReturn_SameNumberOfSeededCards(int numberOfCards)
     {
-        var responses = DataHelper.GetPokemontcgResponsesJson(numberOfCards, 35, 4);
+        var pokedexNumber = numberOfCards; // get a unique id for the test
+        var responses = DataHelper.GetPokemontcgResponsesJson(pokedexNumber, numberOfCards, 35, 4);
         var factory = MockHttpHelper.GetFactory(responses);
-        var sut = new PokemontcgService(factory, _pokeapiService);
+        var sut = new PokemontcgService(factory, _getPokeapiServiceWithId(pokedexNumber));
         
         var cards = await sut.GetAllCardsForAsync(1);
         

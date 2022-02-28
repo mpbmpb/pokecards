@@ -4,7 +4,7 @@ using PokeCards.Tests.InfraStructure;
 
 namespace PokeCards.Tests.Integration;
 
-[Collection("PokemontcgService Integration tests")]
+//[Collection("PokemontcgService Integration tests")]
 public class PokemontcgServiceTests : IClassFixture<ServicesIntegrationTestBase>
 {
     private readonly PokemontcgService _sut;
@@ -15,15 +15,15 @@ public class PokemontcgServiceTests : IClassFixture<ServicesIntegrationTestBase>
     }
 
     [Theory]
-    [InlineData(6, 73, "charizard" )]
+    [InlineData(6, 78, "charizard" )]   // current number of cards, will increase as cards are added
     [InlineData(7, 22, "squirtle" )]
-    [InlineData(150, 65, "mewtwo" )]
+    [InlineData(150, 66, "mewtwo" )]
     [InlineData(722, 16, "rowlet" )]
     public async Task GetAllCardsForAsync_gets_correct_number_of_cards_for_that_pokemon(int id, int count, string name)
     {
         var result = await _sut.GetAllCardsForAsync(id);
-        result.Count.Should().Be(count);
-        result.Count(card => card.Pokemons.Any(p => p.Name == name)).Should().Be(count);
+        result.Count.Should().BeGreaterOrEqualTo(count);                           // cards get added but never removed from db
+        result.Count(card => card.Pokemons.Any(p => p.Name == name)).Should().BeGreaterOrEqualTo(count);
     }
 
     [Theory]

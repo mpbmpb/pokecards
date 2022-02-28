@@ -74,6 +74,13 @@ public static class DataHelper
         return JsonSerializer.Serialize(response);
     }
     
+    public static string GetPokemontcgResponseJson(int pokedexNumber, int numberOfCards, int pageSize)
+    {
+        var response = GetPokemontcgResponseFaker(pokedexNumber, numberOfCards, pageSize, 1).Generate();
+
+        return JsonSerializer.Serialize(response);
+    }
+    
     public static string GetEmptyPokemontcgResponseJson(int numberOfCards, int pageSize, int page)
     {
         var response = GetPokemontcgResponseFaker(1,0, pageSize, page, numberOfCards).Generate();
@@ -85,6 +92,19 @@ public static class DataHelper
     {
         var responses = new string[numberOfPages];
         responses[0] = GetPokemontcgResponseJson(numberOfCards, pageSize);
+
+        for (int i = 1; i < numberOfPages; i++)
+        {
+            responses[i] = GetEmptyPokemontcgResponseJson(numberOfCards, pageSize, i + 1);
+        }
+
+        return responses;
+    }
+
+     public static string[] GetPokemontcgResponsesJson(int pokedexNumber, int numberOfCards, int pageSize, int numberOfPages)
+    {
+        var responses = new string[numberOfPages];
+        responses[0] = GetPokemontcgResponseJson(pokedexNumber, numberOfCards, pageSize);
 
         for (int i = 1; i < numberOfPages; i++)
         {
