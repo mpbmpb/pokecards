@@ -9,7 +9,7 @@ public class PokemontcgService
 {
     private readonly IPokeapiService _pokeapiService;
     private readonly IHttpClientFactory _clientFactory;
-    private readonly MemoryCache _cache;
+    private readonly IMemoryCache _cache;
     private List<Card> _cards = new();
     private readonly object _padLock = new();
     private const int _pageSize = 35;
@@ -21,6 +21,15 @@ public class PokemontcgService
         _cache = new MemoryCache(new MemoryCacheOptions
         {
             SizeLimit = 30
+        });
+    }
+    public PokemontcgService(IHttpClientFactory clientFactory, IPokeapiService pokeapiService, int cacheSize)
+    {
+        _clientFactory = clientFactory;
+        _pokeapiService = pokeapiService;
+        _cache = new MemoryCache(new MemoryCacheOptions
+        {
+            SizeLimit = cacheSize
         });
     }
 
