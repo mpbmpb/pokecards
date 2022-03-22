@@ -36,7 +36,7 @@ public class PokemontcgServiceTests : IDisposable
     {
         var guid = Guid.NewGuid();
         using var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
-        var factory = MockHttpHelper.GetFactory(guid.ToString());
+        var factory = new MockHttpHelper( new [] {guid.ToString()}).GetFactory();
         using var client = factory.CreateClient();
 
         using var response = await client.SendAsync(request);
@@ -54,7 +54,7 @@ public class PokemontcgServiceTests : IDisposable
     {
         var pokedexNumber = numberOfCards; // get a unique id for the test
         var responses = DataHelper.GetPokemontcgResponsesJson(pokedexNumber, numberOfCards, 35, 4);
-        var factory = MockHttpHelper.GetFactory(responses);
+        var factory = new MockHttpHelper(responses).GetFactory();
         var sut = new PokemontcgService(factory, _getPokeapiServiceWithId(pokedexNumber));
         
         var cards = await sut.GetAllCardsForAsync(1);
@@ -66,13 +66,71 @@ public class PokemontcgServiceTests : IDisposable
     public async Task GetCardsForAsync_ShouldReturnCards_WithSimilarProperties()
     {
         var responses = DataHelper.GetPokemontcgResponsesJson(10, 35, 4);
-        var factory = MockHttpHelper.GetFactory(responses);
+        var factory = new MockHttpHelper(responses).GetFactory();
         var sourceCards = DataHelper.ExtractCards(responses);
         var sut = new PokemontcgService(factory, _pokeapiService);
 
         var cards = await sut.GetAllCardsForAsync(1);
 
         cards.Should().BeEquivalentTo(sourceCards);
+    }
+
+    [Fact]
+    public async Task CachedEntry_ShouldNotMakeNewCallToApi()
+    {
+        var response1 = DataHelper.GetPokemontcgResponsesJson(1,10, 35, 4);
+        var response2 = DataHelper.GetPokemontcgResponsesJson(1,20, 35, 4);
+        var responses = response1.Concat(response2).ToArray();
+        
+        var factory = new MockHttpHelper(responses).GetFactory();
+        var sut = new PokemontcgService(factory, _pokeapiService);
+
+        var cards = await sut.GetAllCardsForAsync(1);
+        var cards2 = await sut.GetAllCardsForAsync(1);
+
+        cards.Should().BeEquivalentTo(cards2);
+        cards.Count.Should().Be(10);
+    }
+
+    [Fact]
+    public async Task CachedEntry_ShouldBeEvicted_WhenSizeLimitIsExceeded()
+    {
+        var response1 = DataHelper.GetPokemontcgResponsesJson(1,10, 35, 4);
+        var response2 = DataHelper.GetPokemontcgResponsesJson(2,20, 35, 4);
+        var response3 = DataHelper.GetPokemontcgResponsesJson(1,1, 35, 4);
+        var responses = response1.Concat(response2).Concat(response3).ToArray();
+        
+        var factory = new MockHttpHelper(responses).GetFactory();
+        var sut = new PokemontcgService(factory, _pokeapiService, 1);
+
+        await sut.GetAllCardsForAsync(1);
+        await sut.GetAllCardsForAsync(2);
+        var cards = await sut.GetAllCardsForAsync(1);
+
+        cards.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task NewEntry_ShouldBeStore_WhenOldOneIsEvicted()
+    {
+        var response1 = DataHelper.GetPokemontcgResponsesJson(1,10, 35, 4);
+        var response2 = DataHelper.GetPokemontcgResponsesJson(2,20, 35, 4);
+        var response3 = DataHelper.GetPokemontcgResponsesJson(3,3, 35, 4);
+        var response4 = DataHelper.GetPokemontcgResponsesJson(3,2, 35, 4);
+        var response5 = DataHelper.GetPokemontcgResponsesJson(3,1, 35, 4);
+        var responses = response1.Concat(response2).Concat(response3).Concat(response4).Concat(response5).ToArray();
+        
+        var factory = new MockHttpHelper(responses).GetFactory();
+        var sut = new PokemontcgService(factory, _pokeapiService, 2);
+
+        await sut.GetAllCardsForAsync(1);
+        await sut.GetAllCardsForAsync(2);
+        await sut.GetAllCardsForAsync(3);
+        var cards3 = await sut.GetAllCardsForAsync(3);
+        var cards2 = await sut.GetAllCardsForAsync(2);
+
+        cards2.Count.Should().Be(20);
+        cards3.Count.Should().Be(3);
     }
 
 

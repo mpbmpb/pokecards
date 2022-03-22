@@ -27,10 +27,6 @@ public class MockHttpMessageHandler : HttpMessageHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var index = _requestCount;
-        if ( _requestCount > _responses.Length)
-        {
-            index = _responses.Length - 1;
-        }
 
         Interlocked.Increment(ref _requestCount);
         return new HttpResponseMessage
