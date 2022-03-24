@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Caching.Memory;
 using PokeCards.Contracts.Responses;
 using PokeCards.Data;
+using PokeCards.Services.simplecache;
 
 namespace PokeCards.Services;
 
@@ -9,7 +10,7 @@ public class PokemontcgService
 {
     private readonly IPokeapiService _pokeapiService;
     private readonly IHttpClientFactory _clientFactory;
-    private readonly IMemoryCache _cache;
+    private readonly MemoryCache<List<Card>> _cache;
     private List<Card> _cards = new();
     private readonly object _padLock = new();
     private const int _pageSize = 35;
@@ -18,18 +19,20 @@ public class PokemontcgService
     {
         _clientFactory = clientFactory;
         _pokeapiService = pokeapiService;
-        _cache = new MemoryCache(new MemoryCacheOptions
+        _cache = new MemoryCache<List<Card>>(new CacheOptions
         {
-            SizeLimit = 30
+            SizeLimit = 30,
+            EvictionPolicy = Evict.Oldest
         });
     }
     public PokemontcgService(IHttpClientFactory clientFactory, IPokeapiService pokeapiService, int cacheSize)
     {
         _clientFactory = clientFactory;
         _pokeapiService = pokeapiService;
-        _cache = new MemoryCache(new MemoryCacheOptions
+        _cache = new MemoryCache<List<Card>>(new CacheOptions
         {
-            SizeLimit = cacheSize
+            SizeLimit = cacheSize,
+            EvictionPolicy = Evict.Oldest
         });
     }
 
@@ -45,8 +48,6 @@ public class PokemontcgService
             return cards;
         }
 
-        _cards.Clear();
-        
         using var client = _clientFactory.CreateClient("Pokemontcg");
 
         var success = true;
@@ -77,8 +78,7 @@ public class PokemontcgService
 
         if (success && _cards.Count > 0 && _cards.Count == totalCount)
         {
-            _cache.Set(speciesId, _cards, new MemoryCacheEntryOptions().SetSize(1));
-            _cache.Set(speciesId, _cards, new MemoryCacheEntryOptions().SetSize(1));
+            _cache.Set(speciesId, _cards);
         }
 
         sw.Stop();
