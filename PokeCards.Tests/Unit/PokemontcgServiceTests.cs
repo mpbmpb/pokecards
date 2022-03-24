@@ -14,7 +14,7 @@ using Xunit.Abstractions;
 namespace PokeCards.Tests.Unit;
 
 //[Collection("PokemontcgService Unit tests")]
-public class PokemontcgServiceTests : IDisposable
+public class PokemontcgServiceTests
 {
     private readonly IPokeapiService _pokeapiService;
     private static IPokeapiService _getPokeapiServiceWithId(int pokedexNumber)
@@ -129,14 +129,8 @@ public class PokemontcgServiceTests : IDisposable
         var cards3 = await sut.GetAllCardsForAsync(3);
         var cards2 = await sut.GetAllCardsForAsync(2);
 
-        cards2.Count.Should().Be(20);
         cards3.Count.Should().Be(3);
+        cards2.Count.Should().Be(20);
     }
-
-
-
-    public void Dispose()
-    {
-        GC.Collect();
-    }
+    
 }
