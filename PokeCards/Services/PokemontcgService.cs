@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Microsoft.Extensions.Caching.Memory;
 using PokeCards.Contracts.Responses;
 using PokeCards.Data;
 using PokeCards.Services.simplecache;
@@ -21,8 +20,8 @@ public class PokemontcgService
         _pokeapiService = pokeapiService;
         _cache = new MemoryCache<List<Card>>(new CacheOptions
         {
-            SizeLimit = 30,
-            EvictionPolicy = Evict.Oldest
+            SizeLimit = 5,
+            EvictionPolicy = Evict.LeastRecentlyUsed
         });
     }
     public PokemontcgService(IHttpClientFactory clientFactory, IPokeapiService pokeapiService, int cacheSize)

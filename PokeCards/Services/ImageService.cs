@@ -1,14 +1,14 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Caching.Memory;
 using PokeCards.Data;
+using PokeCards.Services.simplecache;
 
 namespace PokeCards.Services;
 
 public class ImageService
 {
     private readonly IHttpClientFactory _clientFactory;
-    private readonly MemoryCache _cache;
+    private readonly MemoryCache<byte[]> _cache;
     private readonly byte[] _notfoundImage;
     private static readonly Regex ExtensionFromUrl = new Regex(@"\.(?<ext>\w{3})$", 
         RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
@@ -16,9 +16,10 @@ public class ImageService
     public ImageService(IHttpClientFactory clientFactory)
     {
         _clientFactory = clientFactory;
-        _cache = new MemoryCache(new MemoryCacheOptions
+        _cache = new (new CacheOptions
         {
-            SizeLimit = 250
+            SizeLimit = 250,
+            EvictionPolicy = Evict.LeastRecentlyUsed
         });
         _notfoundImage = File.ReadAllBytes("wwwroot/Images/Logos/notfound.png");
     }
@@ -55,8 +56,7 @@ public class ImageService
             try
             {
                 imageBytes = await client.GetByteArrayAsync(url);
-                _cache.Set(url, imageBytes,
-                    new MemoryCacheEntryOptions().SetSize(1));
+                _cache.Set(url, imageBytes);
             }
             catch (Exception)
             {

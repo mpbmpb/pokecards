@@ -1,15 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
-using Bogus;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using PokeCards.Contracts.Responses;
 using PokeCards.Data;
 using PokeCards.Services;
 using PokeCards.Tests.Helpers;
-using Xunit.Abstractions;
 
 namespace PokeCards.Tests.Unit;
 
