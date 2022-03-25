@@ -41,6 +41,8 @@ public class PokemontcgService
         var sw = new Stopwatch();
         sw.Start();
 
+        _cards = new();
+
         if (_cache.TryGetValue(speciesId, out List<Card> cards))
         {
             sw.Stop();

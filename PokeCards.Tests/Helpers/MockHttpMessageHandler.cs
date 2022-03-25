@@ -10,6 +10,7 @@ public class MockHttpMessageHandler : HttpMessageHandler
     private readonly string[] _responses;
     private readonly HttpStatusCode _statusCode;
     private int _requestCount = 0;
+    private object _padLock = new();
 
     public MockHttpMessageHandler(string response, HttpStatusCode statusCode)
     {
@@ -26,13 +27,17 @@ public class MockHttpMessageHandler : HttpMessageHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var index = _requestCount;
-
-        Interlocked.Increment(ref _requestCount);
-        return new HttpResponseMessage
+        lock (_padLock)
         {
-            StatusCode = _statusCode,
-            Content = new StringContent(_responses[index])
-        };
+            var index = _requestCount;
+
+            _requestCount++;
+            return new HttpResponseMessage
+            {
+                StatusCode = _statusCode,
+                Content = new StringContent(_responses[index])
+            };
+        }
+
     }
 }
